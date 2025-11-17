@@ -328,3 +328,59 @@ footer {
 .signin-dropdown a:hover {
   background: #f1f5ff;
 }
+
+.login-section {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0;
+}
+
+.login-columns {
+  display: flex;
+  width: 100%;
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+.col-left {
+  flex: 0 0 360px;
+  max-width: 360px;
+}
+
+.col-left .login-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.col-right {
+  flex: 1 1 auto;
+  padding: 24px;
+}
+
+.login-title {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 720px) {
+  .login-columns {
+    flex-direction: column;
+  }
+
+  .col-left {
+    flex-basis: auto;
+    max-width: 100%;
+  }
+
+  .col-left .login-image {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .col-right {
+    border-left: none;
+  }
+}
