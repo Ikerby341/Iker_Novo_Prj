@@ -1,5 +1,5 @@
 <?php
-    
+    include_once __DIR__ . '/../Controller/controlador.php';
 ?>
 
 <html lang="en">
@@ -23,11 +23,24 @@
             </div>
             <div class="col-right">
                 <h2 class="login-title">Iniciar sessió</h2>
+                <?php
+                    // Mostrar errors de formulari si existeixen a session
+                    if (isset($_SESSION['form_errors']) && is_array($_SESSION['form_errors'])) {
+                        echo '<div class="form-errors"><ul>';
+                        foreach ($_SESSION['form_errors'] as $err) {
+                            echo '<li>' . htmlspecialchars($err) . '</li>';
+                        }
+                        echo '</ul></div>';
+                        unset($_SESSION['form_errors']);
+                    }
+                    $oldUser = $_SESSION['old']['username'] ?? '';
+                    unset($_SESSION['old']);
+                ?>
 
-                <form action="/practiques/backend/Iker_Novo_Prj/app/Controller/login_controller.php" method="post">
+                <form action="/practiques/backend/Iker_Novo_PrJ/app/Controller/login_controller.php" method="post">
                     <label for="username">Nom d'usuari:</label>
                     <br>
-                    <input type="text" id="username" name="username" required><br><br>
+                    <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($oldUser); ?>" required><br><br>
 
                     <label for="password">Contrasenya:</label>
                     <br>

@@ -1,6 +1,33 @@
 <?php
 include_once __DIR__ .'/../Model/modelo.php';
 
+// Session handling: start session and enforce timeout
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+// Session timeout in seconds (40 minutes)
+define('SESSION_TIMEOUT_SECONDS', 40 * 60);
+
+// If last activity exists and exceeded timeout, destroy session
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > SESSION_TIMEOUT_SECONDS)) {
+    // Expired
+    $_SESSION = [];
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $params["path"], $params["domain"],
+            $params["secure"], $params["httponly"]
+        );
+    }
+    session_destroy();
+}
+
+// Update last activity timestamp for active sessions
+if (isset($_SESSION['user_id'])) {
+    $_SESSION['last_activity'] = time();
+}
+
 /**
  * Llegeix la pàgina actual de la query string. Si no existeix o és invàlida, retorna 1.
  * Assegura que el valor retornat sigui un integer >= 1.
@@ -101,6 +128,154 @@ function validar_pagina_solicitada() {
         $qs = http_build_query($params);
         $url = $_SERVER['PHP_SELF'] . '?' . $qs;
         header('Location: ' . $url);
+        exit;
+    }
+}
+
+/* ----------------------------
+   Authentication helpers
+   ---------------------------- */
+
+/**
+ * validar_contrasenya
+ * Retorna array de errors (vacío si és vàlida)
+ */
+function validar_contrasenya($password) {
+    $errors = [];
+    if (strlen($password) < 7) {
+        $errors[] = 'La contrasenya ha de tenir almenys 7 caràcters.';
+    }
+    if (!preg_match('/[A-Z]/', $password)) {
+        $errors[] = 'La contrasenya ha de contenir almenys una majúscula.';
+    }
+    if (!preg_match('/[a-z]/', $password)) {
+        $errors[] = 'La contrasenya ha de contenir almenys una minúscula.';
+    }
+    if (!preg_match('/[^a-zA-Z0-9]/', $password)) {
+        $errors[] = 'La contrasenya ha de contenir almenys un símbol.';
+    }
+    return $errors;
+}
+
+/**
+ * register_user
+ * Procesa dades de registre; retorna array('success'=>bool,'errors'=>array)
+ */
+function register_user($username, $email, $password, $password_confirm) {
+    $username = trim($username);
+    $email = trim($email);
+    $errors = [];
+
+    if ($username === '') $errors[] = 'El nom d\'usuari és obligatori.';
+    if ($email === '') $errors[] = 'L\'email és obligatori.';
+
+    // username únic
+    if (user_exists_by_username($username)) {
+        $errors[] = 'Ja existeix un usuari amb aquest nom d\'usuari.';
+    }
+
+    // contrasenya i confirm
+    if ($password === '') $errors[] = 'La contrasenya és obligatòria.';
+    if ($password !== $password_confirm) $errors[] = 'Les contrasenyes no coincideixen.';
+
+    // validar força contrasenya
+    $pwErrors = validar_contrasenya($password);
+    if (!empty($pwErrors)) $errors = array_merge($errors, $pwErrors);
+
+    if (!empty($errors)) {
+        return ['success' => false, 'errors' => $errors];
+    }
+
+    // hash password
+    $hash = password_hash($password, PASSWORD_BCRYPT);
+    if ($hash === false) {
+        return ['success' => false, 'errors' => ['Error al encriptar la contrasenya.']];
+    }
+
+    $created = create_user($username, $email, $hash);
+    if ($created) {
+        return ['success' => true, 'errors' => []];
+    }
+    return ['success' => false, 'errors' => ['Error en crear l\'usuari a la base de dades.']];
+}
+
+/**
+ * login_user
+ * Verifica credencials. Retorna array('success'=>bool,'errors'=>array)
+ * En cas d'èxit, inicia sessió i posa $_SESSION['user_id'] i $_SESSION['username']
+ */
+function login_user($username, $password) {
+    $username = trim($username);
+    $errors = [];
+
+    if ($username === '') $errors[] = 'El nom d\'usuari és obligatori.';
+    if ($password === '') $errors[] = 'La contrasenya és obligatòria.';
+
+    if (!empty($errors)) return ['success' => false, 'errors' => $errors];
+
+    $user = get_user_by_username($username);
+    if (!$user) return ['success' => false, 'errors' => ['Aquest usuari no existeix.']];
+
+    // verificar contrasenya
+    $stored = $user['password'];
+    $verified = false;
+
+    // intentem verificació amb password_verify si és un hash conegut
+    if (!empty($stored) && password_get_info($stored)['algo'] !== 0) {
+        if (password_verify($password, $stored)) {
+            $verified = true;
+        }
+    } else {
+        // Si no sembla un hash (pot ser text pla a la BD), fem comparació directa
+        if ($password === $stored) {
+            $verified = true;
+            // rehash i actualitza la BD perquè la contrasenya ja no quedi en text pla
+            $newHash = password_hash($password, PASSWORD_BCRYPT);
+            if ($newHash !== false) {
+                update_user_password_hash($user['id'], $newHash);
+            }
+        }
+    }
+
+    if (!$verified) {
+        return ['success' => false, 'errors' => ['Contrasenya incorrecta, si us plau intenta-ho de nou.']];
+    }
+
+    // Iniciar sessió
+    if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['created'] = time();
+    $_SESSION['last_activity'] = time();
+
+    return ['success' => true, 'errors' => []];
+}
+
+/**
+ * is_logged_in
+ * Retorna true si hi ha una sessió vàlida
+ */
+function is_logged_in() {
+    return (isset($_SESSION['user_id']) && !empty($_SESSION['user_id']));
+}
+
+/**
+ * logout_user
+ * Destrueix la sessió i (opcional) redirigeix
+ */
+function logout_user($redirect = null) {
+    if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+    $_SESSION = [];
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $params["path"], $params["domain"],
+            $params["secure"], $params["httponly"]
+        );
+    }
+    session_destroy();
+    if ($redirect) {
+        header('Location: ' . $redirect);
         exit;
     }
 }

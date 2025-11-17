@@ -16,13 +16,19 @@
         <div class="header-inner">
             <a href="index.php" class="menu">🏠 Home</a>
             <div class="header-right">
-                <div class="signin" id="signin">
-                    <button id="signinBtn" class="signin-btn" aria-haspopup="true" aria-expanded="false">🔐 Sign-in</button>
-                    <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
-                        <a href="./app/View/login.php">Iniciar sesión</a>
-                        <a href="./app/View/register.php">Registrarse</a>
+                <?php if (is_logged_in()): ?>
+                    <div class="signin">
+                        <a class="signin-btn" href="/practiques/backend/Iker_Novo_PrJ/app/Controller/logout.php"><?php echo htmlspecialchars($_SESSION['username']); ?></a>
                     </div>
-                </div>
+                <?php else: ?>
+                    <div class="signin" id="signin">
+                        <button id="signinBtn" class="signin-btn" aria-haspopup="true" aria-expanded="false">👤 Sign-in</button>
+                        <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
+                            <a href="./app/View/login.php">Iniciar sesión</a>
+                            <a href="./app/View/register.php">Registrarse</a>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </header>
