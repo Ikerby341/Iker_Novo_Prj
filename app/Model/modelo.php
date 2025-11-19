@@ -9,14 +9,25 @@ require_once __DIR__ . '/../../config/db-connection.php';
  */
 function generar_articles($page = 1, $articlesPerPagina = 3) {
     global $connexio;
-
     try {
         $offset = ($page - 1) * $articlesPerPagina;
 
-    // Afegim ORDER BY per assegurar un ordre consistent entre pagines
-    $stmt = $connexio->prepare("SELECT * FROM coches ORDER BY id ASC LIMIT :limit OFFSET :offset");
+        // Generar SELECT condicionat al login de l'usuari
+        if (is_logged_in()) {
+            $query = "SELECT * FROM coches WHERE owner_id = :owner_id ORDER BY id ASC LIMIT :limit OFFSET :offset";
+        } else {
+            $query = "SELECT * FROM coches ORDER BY id ASC LIMIT :limit OFFSET :offset";
+        }
+
+        // Afegim ORDER BY per assegurar un ordre consistent entre pagines
+        $stmt = $connexio->prepare($query);
         $stmt->bindValue(':limit', (int)$articlesPerPagina, PDO::PARAM_INT);
         $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+        
+        if (is_logged_in()) {
+            $stmt->bindValue(':owner_id', $_SESSION['user_id'], PDO::PARAM_INT);
+        }
+        
         $stmt->execute();
         $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -43,9 +54,18 @@ function generar_articles($page = 1, $articlesPerPagina = 3) {
  */
 function generar_paginacio($currentPage = 1, $articlesPerPagina = 3) {
     global $connexio;
-
     try {
-        $stmt = $connexio->query("SELECT COUNT(*) AS total FROM coches");
+        // Generar SELECT condicionat al login de l'usuari
+        if (is_logged_in()) {
+            $query = "SELECT COUNT(*) AS total FROM coches WHERE owner_id = :owner_id";
+            $stmt = $connexio->prepare($query);
+            $stmt->bindValue(':owner_id', $_SESSION['user_id'], PDO::PARAM_INT);
+            $stmt->execute();
+        } else {
+            $query = "SELECT COUNT(*) AS total FROM coches";
+            $stmt = $connexio->query($query);
+        }
+        
         $resultat = $stmt->fetch(PDO::FETCH_ASSOC);
         $totalArticles = isset($resultat['total']) ? (int)$resultat['total'] : 0;
 
@@ -60,8 +80,8 @@ function generar_paginacio($currentPage = 1, $articlesPerPagina = 3) {
 
         $sortida = '<div class="paginacio">';
 
-    // Parametre per mantenir articles per pagina en els enllaços
-    $perParam = '&per_page=' . urlencode((int)$articlesPerPagina);
+        // Parametre per mantenir articles per pagina en els enllaços
+        $perParam = '&per_page=' . urlencode((int)$articlesPerPagina);
 
         // Botó Anterior (només si hi ha pagina anterior)
         if ($currentPage > 1) {
@@ -99,8 +119,19 @@ function generar_paginacio($currentPage = 1, $articlesPerPagina = 3) {
  */
 function obtenir_total_pagines($articlesPerPagina = 3) {
     global $connexio;
+
     try {
-        $stmt = $connexio->query("SELECT COUNT(*) AS total FROM coches");
+        // Generar SELECT condicionat al login de l'usuari
+        if (is_logged_in()) {
+            $query = "SELECT COUNT(*) AS total FROM coches WHERE owner_id = :owner_id";
+            $stmt = $connexio->prepare($query);
+            $stmt->bindValue(':owner_id', $_SESSION['user_id'], PDO::PARAM_INT);
+            $stmt->execute();
+        } else {
+            $query = "SELECT COUNT(*) AS total FROM coches";
+            $stmt = $connexio->query($query);
+        }
+        
         $resultat = $stmt->fetch(PDO::FETCH_ASSOC);
         $totalArticles = isset($resultat['total']) ? (int)$resultat['total'] : 0;
         if ($articlesPerPagina <= 0) return 1;

@@ -4,7 +4,7 @@ include_once __DIR__ . '/controlador.php';
 
 // Si no és POST, redirigim
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /practiques/backend/Iker_Novo_PrJ');
+    header('Location: /practiques/backend/Iker_Novo_PrJ/');
     exit;
 }
 
@@ -19,14 +19,14 @@ if (isset($_POST['passwordC']) || isset($_POST['email'])) {
     $res = register_user($username, $email, $password, $password_confirm);
     if ($res['success']) {
         // redirigim al login amb missatge opcional
-        header('Location: /practiques/backend/Iker_Novo_PrJ');
+        header('Location: /practiques/backend/Iker_Novo_PrJ/');
         exit;
     } else {
         // Guardem errors a session i tornem a la pàgina de registre
         if (session_status() !== PHP_SESSION_ACTIVE) session_start();
         $_SESSION['form_errors'] = $res['errors'];
         $_SESSION['old'] = ['username' => $username, 'email' => $email];
-        header('Location: /practiques/backend/Iker_Novo_PrJ');
+        header('Location: /practiques/backend/Iker_Novo_PrJ/');
         exit;
     }
 } else {
@@ -37,12 +37,12 @@ if (isset($_POST['passwordC']) || isset($_POST['email'])) {
     $res = login_user($username, $password);
     if ($res['success']) {
         // exitoso: redirigimos a la vista principal
-        header('Location: /practiques/backend/Iker_Novo_PrJ');
+        header('Location: /practiques/backend/Iker_Novo_PrJ/');
         exit;
     } else {
         if (session_status() !== PHP_SESSION_ACTIVE) session_start();
         $_SESSION['form_errors'] = $res['errors'];
-        header('Location: /practiques/backend/Iker_Novo_PrJ');
+        header('Location: /practiques/backend/Iker_Novo_PrJ/');
         exit;
     }
 }

@@ -1,5 +1,24 @@
 <?php
     include_once __DIR__ . '/../Controller/controlador.php';
+
+    // Procesar login si es POST
+    $errors = [];
+    $oldUser = '';
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $oldUser = $username;
+
+        $result = login_user($username, $password);
+        if ($result['success']) {
+            // Login correcto: redirige a la vista principal
+            header('Location: /practiques/backend/Iker_Novo_Prj/');
+            exit;
+        } else {
+            // Errores: guardar para mostrar
+            $errors = $result['errors'];
+        }
+    }
 ?>
 
 <html lang="en">
@@ -24,20 +43,17 @@
             <div class="col-right">
                 <h2 class="login-title">Iniciar sessió</h2>
                 <?php
-                    // Mostrar errors de formulari si existeixen a session
-                    if (isset($_SESSION['form_errors']) && is_array($_SESSION['form_errors'])) {
+                    // Mostrar errors si existen
+                    if (!empty($errors)) {
                         echo '<div class="form-errors"><ul>';
-                        foreach ($_SESSION['form_errors'] as $err) {
+                        foreach ($errors as $err) {
                             echo '<li>' . htmlspecialchars($err) . '</li>';
                         }
                         echo '</ul></div>';
-                        unset($_SESSION['form_errors']);
                     }
-                    $oldUser = $_SESSION['old']['username'] ?? '';
-                    unset($_SESSION['old']);
                 ?>
 
-                <form action="/practiques/backend/Iker_Novo_PrJ/app/Controller/login_controller.php" method="post">
+                <form method="post">
                     <label for="username">Nom d'usuari:</label>
                     <br>
                     <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($oldUser); ?>" required><br><br>

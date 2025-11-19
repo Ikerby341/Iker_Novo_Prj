@@ -1,5 +1,26 @@
 <?php
     include_once __DIR__ . '/../Controller/controlador.php';
+    
+    $errors = [];
+    $oldUser = '';
+    $oldEmail = '';
+    
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $username = $_POST['username'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $passwordC = $_POST['passwordC'] ?? '';
+        
+        $result = register_user($username, $email, $password, $passwordC);
+        if ($result['success']) {
+            header('Location: /practiques/backend/Iker_Novo_Prj/app/View/login.php');
+            exit;
+        } else {
+            $errors = $result['errors'];
+            $oldUser = $username;
+            $oldEmail = $email;
+        }
+    }
 ?>
 
 <html lang="en">
@@ -24,21 +45,16 @@
             <div class="col-right">
                 <h2 class="login-title">Registrarse</h2>
                 <?php
-                    if (isset($_SESSION['form_errors']) && is_array($_SESSION['form_errors'])) {
+                    if (!empty($errors)) {
                         echo '<div class="form-errors"><ul>';
-                        foreach ($_SESSION['form_errors'] as $err) {
+                        foreach ($errors as $err) {
                             echo '<li>' . htmlspecialchars($err) . '</li>';
                         }
                         echo '</ul></div>';
-                        unset($_SESSION['form_errors']);
                     }
-                    $old = $_SESSION['old'] ?? [];
-                    $oldUser = $old['username'] ?? '';
-                    $oldEmail = $old['email'] ?? '';
-                    unset($_SESSION['old']);
                 ?>
 
-                <form action="/practiques/backend/Iker_Novo_PrJ/app/Controller/login_controller.php" method="post">
+                <form method="post">
                     <label for="username">Nom d'usuari:</label>
                     <br>
                     <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($oldUser); ?>" required><br><br>
