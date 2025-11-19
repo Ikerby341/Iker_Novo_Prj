@@ -1,0 +1,37 @@
+<?php
+    // Incluïm el controlador principal que inicia la sessió
+    include_once __DIR__ .'/controlador.php';
+    
+    // Incluïm el model que conté la lògica de negoci i accés a dades
+    include_once __DIR__ .'/../Model/modelo.php';
+
+    /**
+     * Funció per inserir una nova dada
+     * @param string $marca - La marca del nou article
+     * @param string $model - El model del nou article
+     * @return mixed - Retorna el resultat de l'operació d'inserció
+     */
+    function inserirDada($marca, $model) {
+        return inserir($marca, $model);
+    }
+
+    /**
+     * Funció per modificar una dada existent
+     * @param int $id - ID del registre a modificar
+     * @param string $camp - Nom del camp que es vol modificar
+     * @param string $dadaN - Nova dada que s'inserirà
+     * @return mixed - Retorna el resultat de l'operació de modificació
+     */
+    function modificarDada($id, $camp, $dadaN) {
+        return modificar($id, $camp, $dadaN);
+    }
+
+    /**
+     * Funció per esborrar una dada
+     * @param int $id - ID del registre a esborrar
+     * @return mixed - Retorna el resultat de l'operació d'esborrat
+     */
+    function esborrarDada($id) {
+        return esborrar($id);
+    }
+?>

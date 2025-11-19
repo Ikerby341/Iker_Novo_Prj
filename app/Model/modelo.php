@@ -202,5 +202,77 @@ function update_user_password_hash($userId, $newHash) {
     }
 }
 
+/**
+ * Insereix un nou article a la base de dades
+ * 
+ * @param string $marca - Marca del cotxe
+ * @param string $model - Model del cotxe
+ * @return string - Missatge de confirmació o error
+ */
+function inserir($marca,$model) {
+    global $connexio;
+
+    try {
+        // Preparar i executar la inserció amb paràmetres
+        $query = "INSERT INTO coches (marca, model, owner_id) VALUES (:marca, :model, :owner_id)";
+        $stmt = $connexio->prepare($query);
+        $stmt->bindValue(':marca', $marca, PDO::PARAM_STR);
+        $stmt->bindValue(':model', $model, PDO::PARAM_STR);
+        $stmt->bindValue(':owner_id', $_SESSION['user_id'], PDO::PARAM_INT);
+        $stmt->execute();
+
+        return "Artículo creado correctamente!";
+    } catch (PDOException $e) {
+        return "Error en la creación: " . $e->getMessage();
+    }
+}
+
+/**
+ * Modifica un article existent a la base de dades
+ * 
+ * @param int $id - ID de l'article a modificar
+ * @param string $camp - Nom del camp a modificar (titol o cos)
+ * @param string $dadaN - Nova dada a inserir
+ * @return string - Missatge de confirmació o error
+ */
+function modificar($id,$camp,$dadaN) {
+    global $connexio;
+
+    try {
+        // Preparar i executar l'actualització amb paràmetres
+        $stmt = $connexio->prepare("UPDATE coches SET $camp = ? WHERE id = ?");
+        $stmt->execute([$dadaN,$id]);
+
+        return "Artículo actualizado correctamente!";
+    } catch (PDOException $e) {
+        return "Error en la actualización: " . $e->getMessage();
+    }
+}
+
+/**
+ * Esborra un article de la base de dades
+ * 
+ * @param int $id - ID de l'article a esborrar
+ * @return string - Missatge de confirmació o error
+ */
+function esborrar($id) {
+    global $connexio;
+
+    try {
+        // Preparar i executar l'eliminació amb paràmetres
+        $stmt = $connexio->prepare("DELETE FROM coches WHERE id = ?");
+        $stmt->execute([$id]);
+
+        // Comprovar si s'ha esborrat algun registre
+        if ($stmt->rowCount() > 0) {
+            return "Artículo borrado correctamente!";
+        } else {
+            return "No se ha encontrado el artículo con ID especificada.";
+        }
+    } catch (PDOException $e) {
+        return "Error en la eliminación: " . $e->getMessage();
+    }
+}
+
 
 ?>
