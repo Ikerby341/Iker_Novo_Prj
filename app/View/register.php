@@ -43,7 +43,7 @@
                 <img src="./../../public/assets/img/GT3RSrec.png" alt="GT3RSrec" class="login-image">
             </div>
             <div class="col-right">
-                <h2 class="login-title">Registrarse</h2>
+                <h2 class="login-title">Registrar-se</h2>
                 <?php
                     if (!empty($errors)) {
                         echo '<div class="form-errors"><ul>';

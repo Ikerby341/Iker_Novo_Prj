@@ -1,16 +1,60 @@
 <?php
-// Incluïm el controlador que conté les funcions d'esborrat
+// Incloem el controlador que inicia la sessió i el model
+include_once __DIR__ . '/../Controller/controlador.php';
 include_once __DIR__ . '/../Controller/CRUDcontroller.php';
 
-// Inicialitzem la variable que contindrà el missatge de resposta
-$missatge = '';
+// Protegim l'accés: aquesta pàgina només es pot accedir via POST per esborrar
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    // Redirigim a la vista principal (no permetem GET)
+    header('Location: /practiques/backend/Iker_Novo_PrJ/');
+    exit;
+}
 
-// Comprovem si s'ha enviat el formulari (mètode POST)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Obtenim l'ID del registre a esborrar
-    $id = $_POST['id'] ?? '';
-    // Cridem a la funció per esborrar la dada i guardem el resultat
+// Ara processem la petició POST
+// Verifiquem que l'usuari està identificat
+if (!is_logged_in()) {
+    header('Location: /practiques/backend/Iker_Novo_PrJ/app/View/login.php');
+    exit;
+}
+
+$missatge = '';
+$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+if ($id <= 0) {
+    $missatge = 'ID invàlida';
+    $_SESSION['flash'] = $missatge;
+    header('Location: /practiques/backend/Iker_Novo_PrJ/');
+    exit;
+}
+
+// Verifiquem que l'article pertany a l'usuari abans d'esborrar
+    try {
+    global $connexio;
+    $stmt = $connexio->prepare('SELECT owner_id FROM coches WHERE ID = ? LIMIT 1');
+    $stmt->execute([$id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$row) {
+        $missatge = 'Article no trobat';
+        $_SESSION['flash'] = $missatge;
+        header('Location: /practiques/backend/Iker_Novo_PrJ/');
+        exit;
+    }
+    if ((int)$row['owner_id'] !== (int)($_SESSION['user_id'] ?? 0)) {
+        $missatge = 'No tens permís per esborrar aquest article';
+        $_SESSION['flash'] = $missatge;
+        header('Location: /practiques/backend/Iker_Novo_PrJ/');
+        exit;
+    }
+
+    // Esborrar
     $missatge = esborrarDada($id);
+    // Guardar missatge en sessió i redirigir a la vista principal
+    $_SESSION['flash'] = $missatge;
+    header('Location: /practiques/backend/Iker_Novo_PrJ/');
+    exit;
+} catch (PDOException $e) {
+    $_SESSION['flash'] = 'Error en la base de dades: ' . $e->getMessage();
+    header('Location: /practiques/backend/Iker_Novo_PrJ/');
+    exit;
 }
 ?>
 
@@ -19,21 +63,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eliminar artículo</title>
+    <title>Esborrar article</title>
     <!-- Enllaç als estils CSS -->
     <link rel="stylesheet" href="./../../resources/styles/style.css">
 </head>
 <body>
     <!-- Títol principal de la pàgina -->
-    <h1>Eliminar artículo</h1>
+    <h1>Esborrar article</h1>
 
     <!-- Formulari per esborrar dades -->
-    <form method="POST" action="">
+    <form method="POST" action="/practiques/backend/Iker_Novo_PrJ/">
         <!-- Camp per l'ID del registre a esborrar -->
-        <label>Digues una ID per eliminar:</label><br>
-        <input type="number" name="id" style="width: 50px; text-align: center;" required>
+        <label hidden>Digues una ID per eliminar:</label><br>
+        <input type="number" name="id" style="width: 50px; text-align: center;" required hidden>
         <!-- Botó per enviar el formulari -->
-        <button class="principalBox" type="submit" style="width: auto;">Eliminar 🗑️</button>
+        <button class="principalBox" type="submit" style="width: auto;">Esborrar 🗑️</button>
     </form>
 
     <!-- Contenidor per mostrar missatges de resposta -->

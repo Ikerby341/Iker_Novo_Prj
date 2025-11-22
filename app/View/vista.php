@@ -20,18 +20,16 @@
                     <div class="signin" id="signin">
                         <button id="signinBtn" class="signin-btn" aria-haspopup="true" aria-expanded="false">👤 <?php echo htmlspecialchars($_SESSION['username']); ?></button>
                         <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
-                            <a href="./app/View/create.php">Crear artículos</a>
-                            <a href="./app/View/update.php">Modificar artículos</a>
-                            <a href="./app/View/delete.php">Eliminar artículos</a>
-                            <a href="./app/Controller/logout.php">Cerrar sesión</a>
+                                <a href="./app/View/create.php">Crear articles</a>
+                                <a href="./app/Controller/logout.php">Tancar sessió</a>
                         </div>
                     </div>
                 <?php else: ?>
                     <div class="signin" id="signin">
                         <button id="signinBtn" class="signin-btn" aria-haspopup="true" aria-expanded="false">🔐 Sign-in</button>
                         <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
-                            <a href="./app/View/login.php">Iniciar sesión</a>
-                            <a href="./app/View/register.php">Registrarse</a>
+                            <a href="./app/View/login.php">Iniciar sessió</a>
+                                <a href="./app/View/register.php">Registrar-se</a>
                         </div>
                     </div>
                 <?php endif; ?>
@@ -41,6 +39,12 @@
     <h1>Cotxes</h1>
     <div class="divPrincipal">
         <?php
+            // Mostrar mensaje flash si existe
+            if (isset($_SESSION['flash']) && $_SESSION['flash'] !== '') {
+                echo '<div class="flash-message" style="padding:10px;margin-bottom:10px;background:#f8f9fa;border:1px solid #ddd;border-radius:4px; color: pink;">' . htmlspecialchars($_SESSION['flash']) . '</div>';
+                unset($_SESSION['flash']);
+            }
+
             // Mostrar input per a articles per pàgina (entrada lliure)
             $currentPerPage = isset($_GET['per_page']) && is_numeric($_GET['per_page']) ? (int)$_GET['per_page'] : 3;
         ?>

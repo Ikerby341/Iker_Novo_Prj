@@ -14,9 +14,9 @@ function generar_articles($page = 1, $articlesPerPagina = 3) {
 
         // Generar SELECT condicionat al login de l'usuari
         if (is_logged_in()) {
-            $query = "SELECT * FROM coches WHERE owner_id = :owner_id ORDER BY id ASC LIMIT :limit OFFSET :offset";
+            $query = "SELECT * FROM coches WHERE owner_id = :owner_id ORDER BY ID ASC LIMIT :limit OFFSET :offset";
         } else {
-            $query = "SELECT * FROM coches ORDER BY id ASC LIMIT :limit OFFSET :offset";
+            $query = "SELECT * FROM coches ORDER BY ID ASC LIMIT :limit OFFSET :offset";
         }
 
         // Afegim ORDER BY per assegurar un ordre consistent entre pagines
@@ -34,9 +34,32 @@ function generar_articles($page = 1, $articlesPerPagina = 3) {
         if (count($articles) > 0) {
             $sortida = '';
             foreach ($articles as $fila) {
+                $id = isset($fila['ID']) ? (int)$fila['ID'] : 0;
                 $marca = isset($fila['marca']) ? htmlspecialchars($fila['marca']) : '';
                 $model = isset($fila['model']) ? htmlspecialchars($fila['model']) : '';
-                $sortida .= "<section> <h3>$marca</h3><p>$model</p> </section>";
+                $ownerId = isset($fila['owner_id']) ? (int)$fila['owner_id'] : null;
+
+                // Estructura: contenido a la izquierda, acciones a la derecha (flex)
+                $sortida .= '<section class="article-row">';
+                $sortida .= '<div class="article-content">';
+                $sortida .= "<h3>$marca</h3><p>$model</p>";
+                $sortida .= '</div>';
+
+                // Mostrar formulari d'esborrat i d'editar únicament si l'usuari està identificat i és el propietari
+                if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['user_id']) && $ownerId !== null && $_SESSION['user_id'] === $ownerId) {
+                    $sortida .= '<div class="article-actions">';
+                    $sortida .= '<form method="post" action="/practiques/backend/Iker_Novo_PrJ/app/View/update.php">';
+                    $sortida .= '<input type="hidden" name="id" value="' . $id . '">';
+                    $sortida .= '<button type="submit" class="edit-btn" title="Editar">✏️</button>';
+                    $sortida .= '</form>';
+                    $sortida .= '<form method="post" action="/practiques/backend/Iker_Novo_PrJ/app/View/delete.php">';
+                    $sortida .= '<input type="hidden" name="id" value="' . $id . '">';
+                    $sortida .= '<button type="submit" class="delete-btn" title="Esborrar">🗑️</button>';
+                    $sortida .= '</form>';
+                    $sortida .= '</div>';
+                }
+
+                $sortida .= '</section>';
             }
             return $sortida;
         } else {
@@ -221,9 +244,9 @@ function inserir($marca,$model) {
         $stmt->bindValue(':owner_id', $_SESSION['user_id'], PDO::PARAM_INT);
         $stmt->execute();
 
-        return "Artículo creado correctamente!";
+            return "Article creat correctament!";
     } catch (PDOException $e) {
-        return "Error en la creación: " . $e->getMessage();
+        return "Error en la creació: " . $e->getMessage();
     }
 }
 
@@ -238,14 +261,15 @@ function inserir($marca,$model) {
 function modificar($id,$camp,$dadaN) {
     global $connexio;
 
-    try {
-        // Preparar i executar l'actualització amb paràmetres
-        $stmt = $connexio->prepare("UPDATE coches SET $camp = ? WHERE id = ?");
-        $stmt->execute([$dadaN,$id]);
+        try {
+            // Preparar i executar l'actualització amb paràmetres (columna ID en majúscules)
+            $stmt = $connexio->prepare("UPDATE coches SET $camp = ? WHERE ID = ?");
+            $stmt->execute([$dadaN,$id]);
 
-        return "Artículo actualizado correctamente!";
+        return "Artícle actualitzat correctament!";
+            return "Article actualitzat correctament!";
     } catch (PDOException $e) {
-        return "Error en la actualización: " . $e->getMessage();
+        return "Error en la actualització: " . $e->getMessage();
     }
 }
 
@@ -258,19 +282,19 @@ function modificar($id,$camp,$dadaN) {
 function esborrar($id) {
     global $connexio;
 
-    try {
-        // Preparar i executar l'eliminació amb paràmetres
-        $stmt = $connexio->prepare("DELETE FROM coches WHERE id = ?");
-        $stmt->execute([$id]);
+        try {
+            // Preparar i executar l'eliminació amb paràmetres (columna ID en majúscules)
+            $stmt = $connexio->prepare("DELETE FROM coches WHERE ID = ?");
+            $stmt->execute([$id]);
 
         // Comprovar si s'ha esborrat algun registre
         if ($stmt->rowCount() > 0) {
-            return "Artículo borrado correctamente!";
+              return "Article esborrat correctament!";
         } else {
-            return "No se ha encontrado el artículo con ID especificada.";
+              return "No s'ha trobat l'article amb la ID especificada.";
         }
     } catch (PDOException $e) {
-        return "Error en la eliminación: " . $e->getMessage();
+        return "Error en la eliminació: " . $e->getMessage();
     }
 }
 

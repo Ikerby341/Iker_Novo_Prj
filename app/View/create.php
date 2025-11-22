@@ -20,31 +20,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear artículo</title>
+    <title>Crear article</title>
     <!-- Enllaç als estils CSS -->
     <link rel="stylesheet" href="./../../resources/styles/style.css">
 </head>
 <body>
     <!-- Títol principal de la pàgina -->
-    <h1>Crear artículo</h1>
-<section class="login-section">
+    <h1>Crear article</h1>
+<section class="CRUD-section">
+    <!-- Contenidor per mostrar missatges de resposta -->
+    <div>
+        <?php echo $missatge; ?>
+    </div>
     <!-- Formulari per inserir noves dades -->
     <form method="POST" action="">
         <!-- Camp pel títol -->
         <label>Marca:</label><br>
         <input type="text" name="titol" required><br>
         <!-- Camp pel cos del missatge -->
-        <label>Modelo:</label><br>
+        <label>Model:</label><br>
         <input type="text" name="cos" required><br><br>
         <!-- Botó per enviar el formulari -->
         <button class="principalBox" type="submit" style="width: auto;">Insertar ⛳</button>
     </form>
-
-    <!-- Contenidor per mostrar missatges de resposta -->
-    <div>
-        <?php echo $missatge; ?>
-    </div>
-
+    <br>
     <!-- Botó per tornar a la pàgina principal -->
     <button class="box" style="width: auto;" onclick="location.href='./../../index.php';">← Tornar enrere</button>
 </section>
