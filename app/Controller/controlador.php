@@ -23,6 +23,32 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     session_destroy();
 }
 
+// If session is not active (or was destroyed) try to restore from remember-me cookie
+if ((!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) && isset($_COOKIE['remember_token']) && !empty($_COOKIE['remember_token'])) {
+    $cookieToken = $_COOKIE['remember_token'];
+    $user = find_user_by_remember_token($cookieToken);
+    if ($user) {
+        // restore session
+        if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['created'] = time();
+        $_SESSION['last_activity'] = time();
+
+        // rotate token for safety
+        try {
+            $newToken = bin2hex(random_bytes(32));
+        } catch (Exception $e) {
+            $newToken = bin2hex(openssl_random_pseudo_bytes(32));
+        }
+        set_remember_token($user['id'], $newToken);
+        setcookie('remember_token', $newToken, time() + (30*24*60*60), '/', '', false, true);
+    } else {
+        // invalid token: clear cookie
+        setcookie('remember_token', '', time() - 3600, '/', '', false, true);
+    }
+}
+
 // Update last activity timestamp for active sessions
 if (isset($_SESSION['user_id'])) {
     $_SESSION['last_activity'] = time();
@@ -233,7 +259,7 @@ function register_user($username, $email, $password, $password_confirm) {
  * Verifica credencials. Retorna array('success'=>bool,'errors'=>array)
  * En cas d'èxit, inicia sessió i posa $_SESSION['user_id'] i $_SESSION['username']
  */
-function login_user($username, $password) {
+function login_user($username, $password, $remember = false) {
     $username = trim($username);
     $errors = [];
 
@@ -277,6 +303,18 @@ function login_user($username, $password) {
     $_SESSION['created'] = time();
     $_SESSION['last_activity'] = time();
 
+    // Si l'usuari vol que el sistema el recordi, generem un token i l'emmagatzemem
+    if ($remember) {
+        try {
+            $token = bin2hex(random_bytes(32));
+        } catch (Exception $e) {
+            $token = bin2hex(openssl_random_pseudo_bytes(32));
+        }
+        // Desar token a la BD i a la cookie (30 dies)
+        set_remember_token($user['id'], $token);
+        setcookie('remember_token', $token, time() + (30*24*60*60), '/', '', false, true);
+    }
+
     return ['success' => true, 'errors' => []];
 }
 
@@ -294,6 +332,17 @@ function is_logged_in() {
  */
 function logout_user($redirect = null) {
     if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+    // If there is a logged user, clear their remember token in DB and cookie
+    $uid = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+    if ($uid) {
+        // try to clear token in DB
+        if (function_exists('clear_remember_token')) {
+            clear_remember_token($uid);
+        }
+        // clear cookie
+        setcookie('remember_token', '', time() - 3600, '/', '', false, true);
+    }
+
     $_SESSION = [];
     if (ini_get("session.use_cookies")) {
         $params = session_get_cookie_params();

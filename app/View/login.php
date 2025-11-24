@@ -7,9 +7,10 @@
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
+        $remember = isset($_POST['rememberMe']) && $_POST['rememberMe'] ? true : false;
         $oldUser = $username;
 
-        $result = login_user($username, $password);
+        $result = login_user($username, $password, $remember);
         if ($result['success']) {
             // Login correcto: redirige a la vista principal
             header('Location: /practiques/backend/Iker_Novo_Prj/');
@@ -61,16 +62,17 @@
                     <label for="password">Contrasenya:</label>
                     <br>
                     <input type="password" id="password" name="password" required><br><br>
-
                     <button type="submit">Iniciar sessió</button>
+                    
+                    <label style="display:inline-flex; align-items:center; gap:6px;">
+                        <input type="checkbox" id="rememberMe" name="rememberMe" value="1">
+                        <span class="login-text"> Remember Me</span>
+                    </label>
                 </form>
             </div>
         </div>
         <div class="login-footer">
             <span class="login-text">No tens compte? <a style="color: blue;" href="register.php">Registra't aquí</a></span>
-            <span>&nbsp;&nbsp;&nbsp;</span>
-            <input type="checkbox" id="rememberMe" name="rememberMe">
-            <span class="login-text"> Remember Me</span>
         </div>
     </section>
 </body>

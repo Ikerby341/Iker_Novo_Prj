@@ -233,6 +233,35 @@ function update_user_password_hash($userId, $newHash) {
 }
 
 /**
+ * Remember-me token helpers
+ */
+function set_remember_token($userId, $token) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('UPDATE usuarios SET remember_token = :t WHERE id = :id');
+        return $stmt->execute([':t' => $token, ':id' => $userId]);
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+function find_user_by_remember_token($token) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('SELECT * FROM usuarios WHERE remember_token = :t LIMIT 1');
+        $stmt->execute([':t' => $token]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user ? $user : false;
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+function clear_remember_token($userId) {
+    return set_remember_token($userId, null);
+}
+
+/**
  * Insereix un nou article a la base de dades
  * 
  * @param string $marca - Marca del cotxe

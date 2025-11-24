@@ -33,8 +33,9 @@ if (isset($_POST['passwordC']) || isset($_POST['email'])) {
     // login
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
+    $remember = isset($_POST['rememberMe']) && $_POST['rememberMe'] ? true : false;
 
-    $res = login_user($username, $password);
+    $res = login_user($username, $password, $remember);
     if ($res['success']) {
         // exitoso: redirigimos a la vista principal
         header('Location: /practiques/backend/Iker_Novo_PrJ/');
