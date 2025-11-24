@@ -40,7 +40,7 @@
     <section class="login-section">
         <div class="login-columns">
             <div class="col-left">
-                <img src="./../../public/assets/img/GT3RSrec.png" alt="GT3RSrec" class="login-image">
+                <img src="./../../public/assets/img/UrusREC.png" alt="Lambroghini Urus" class="login-image">
             </div>
             <div class="col-right">
                 <h2 class="login-title">Registrar-se</h2>
@@ -61,7 +61,7 @@
                     
                     <label for="email">Correu electronic:</label>
                     <br>
-                    <input type="text" id="email" name="email" value="<?php echo htmlspecialchars($oldEmail); ?>" required><br><br>
+                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($oldEmail); ?>" required><br><br>
 
                     <label for="password">Contrasenya:</label>
                     <br>
@@ -73,9 +73,10 @@
 
                     <button type="submit">Registrar-se</button>
                 </form>
-                <p>Ja tens compte? <a style="color: blue;" href="login.php">Inicia sessió aquí</a></p>
-            </div>
-            
+            </div> 
+        </div>
+        <div class="login-footer">
+            <p class="login-text">Ja tens compte? <a style="color: blue;" href="login.php">Inicia sessió aquí</a></p>
         </div>
     </section>
 </body>

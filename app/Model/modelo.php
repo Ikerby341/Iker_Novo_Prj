@@ -7,66 +7,71 @@ require_once __DIR__ . '/../../config/db-connection.php';
  * Retorna un string HTML amb els articles.
  * params: $page (int), $articlesPerPagina (int)
  */
-function generar_articles($page = 1, $articlesPerPagina = 3) {
+function generar_articles($page = 1, $articlesPerPagina = 3, $sort = 'ID', $dir = 'ASC') {
     global $connexio;
     try {
         $offset = ($page - 1) * $articlesPerPagina;
 
-        // Generar SELECT condicionat al login de l'usuari
+        // Validar i normalitzar els paràmetres d'ordenació (llista blanca)
+        $allowed = ['ID','marca','model'];
+        $sort = in_array($sort, $allowed, true) ? $sort : 'ID';
+        $dir = strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC';
+
+        $orderClause = "ORDER BY $sort $dir";
+
+        // Construir la consulta segons si l'usuari està autenticat
         if (is_logged_in()) {
-            $query = "SELECT * FROM coches WHERE owner_id = :owner_id ORDER BY ID ASC LIMIT :limit OFFSET :offset";
+            $query = "SELECT * FROM coches WHERE owner_id = :owner_id $orderClause LIMIT :limit OFFSET :offset";
         } else {
-            $query = "SELECT * FROM coches ORDER BY ID ASC LIMIT :limit OFFSET :offset";
+            $query = "SELECT * FROM coches $orderClause LIMIT :limit OFFSET :offset";
         }
 
-        // Afegim ORDER BY per assegurar un ordre consistent entre pagines
         $stmt = $connexio->prepare($query);
         $stmt->bindValue(':limit', (int)$articlesPerPagina, PDO::PARAM_INT);
         $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
-        
         if (is_logged_in()) {
             $stmt->bindValue(':owner_id', $_SESSION['user_id'], PDO::PARAM_INT);
         }
-        
+
         $stmt->execute();
         $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (count($articles) > 0) {
-            $sortida = '';
-            foreach ($articles as $fila) {
-                $id = isset($fila['ID']) ? (int)$fila['ID'] : 0;
-                $marca = isset($fila['marca']) ? htmlspecialchars($fila['marca']) : '';
-                $model = isset($fila['model']) ? htmlspecialchars($fila['model']) : '';
-                $ownerId = isset($fila['owner_id']) ? (int)$fila['owner_id'] : null;
-
-                // Estructura: contenido a la izquierda, acciones a la derecha (flex)
-                $sortida .= '<section class="article-row">';
-                $sortida .= '<div class="article-content">';
-                $sortida .= "<h3>$marca</h3><p>$model</p>";
-                $sortida .= '</div>';
-
-                // Mostrar formulari d'esborrat i d'editar únicament si l'usuari està identificat i és el propietari
-                if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['user_id']) && $ownerId !== null && $_SESSION['user_id'] === $ownerId) {
-                    $sortida .= '<div class="article-actions">';
-                    $sortida .= '<form method="post" action="/practiques/backend/Iker_Novo_PrJ/app/View/update.php">';
-                    $sortida .= '<input type="hidden" name="id" value="' . $id . '">';
-                    $sortida .= '<button type="submit" class="edit-btn" title="Editar">✏️</button>';
-                    $sortida .= '</form>';
-                    $sortida .= '<form method="post" action="/practiques/backend/Iker_Novo_PrJ/app/View/delete.php">';
-                    $sortida .= '<input type="hidden" name="id" value="' . $id . '">';
-                    $sortida .= '<button type="submit" class="delete-btn" title="Esborrar">🗑️</button>';
-                    $sortida .= '</form>';
-                    $sortida .= '</div>';
-                }
-
-                $sortida .= '</section>';
-            }
-            return $sortida;
-        } else {
+        if (count($articles) === 0) {
             return "<p> No hi ha articles disponibles. </p>";
         }
+
+        $sortida = '';
+        foreach ($articles as $fila) {
+            $id = isset($fila['ID']) ? (int)$fila['ID'] : 0;
+            $marca = isset($fila['marca']) ? htmlspecialchars($fila['marca']) : '';
+            $model = isset($fila['model']) ? htmlspecialchars($fila['model']) : '';
+            $ownerId = isset($fila['owner_id']) ? (int)$fila['owner_id'] : null;
+
+            $sortida .= '<section class="article-row">';
+            $sortida .= '<div class="article-content">';
+            $sortida .= "<h3>$marca</h3><p>$model</p>";
+            $sortida .= '</div>';
+
+            if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['user_id']) && $ownerId !== null && $_SESSION['user_id'] === $ownerId) {
+                $sortida .= '<div class="article-actions">';
+                $sortida .= '<form method="post" action="/practiques/backend/Iker_Novo_PrJ/app/View/update.php">';
+                $sortida .= '<input type="hidden" name="id" value="' . $id . '">';
+                $sortida .= '<button type="submit" class="edit-btn" title="Editar">✏️</button>';
+                $sortida .= '</form>';
+                $sortida .= '<form method="post" action="/practiques/backend/Iker_Novo_PrJ/app/View/delete.php">';
+                $sortida .= '<input type="hidden" name="id" value="' . $id . '">';
+                $sortida .= '<button type="submit" class="delete-btn" title="Esborrar">🗑️</button>';
+                $sortida .= '</form>';
+                $sortida .= '</div>';
+            }
+
+            $sortida .= '</section>';
+        }
+
+        return $sortida;
+
     } catch (PDOException $e) {
-        return "<h1> Error en la consulta: " . $e->getMessage() . "</h1>";
+        return "<h1> Error en la consulta: " . htmlspecialchars($e->getMessage()) . "</h1>";
     }
 }
 
@@ -75,7 +80,7 @@ function generar_articles($page = 1, $articlesPerPagina = 3) {
  * Genera els enllaços de paginacio (Anterior / Numeros / Seguent)
  * params: $currentPage (int), $articlesPerPagina (int)
  */
-function generar_paginacio($currentPage = 1, $articlesPerPagina = 3) {
+function generar_paginacio($currentPage = 1, $articlesPerPagina = 3, $sort = 'ID', $dir = 'ASC') {
     global $connexio;
     try {
         // Generar SELECT condicionat al login de l'usuari
@@ -103,13 +108,15 @@ function generar_paginacio($currentPage = 1, $articlesPerPagina = 3) {
 
         $sortida = '<div class="paginacio">';
 
-        // Parametre per mantenir articles per pagina en els enllaços
+        // Parametre per mantenir articles per pagina i ordenació en els enllaços
         $perParam = '&per_page=' . urlencode((int)$articlesPerPagina);
+        $sortParam = '&sort=' . urlencode($sort);
+        $dirParam = '&dir=' . urlencode($dir);
 
         // Botó Anterior (només si hi ha pagina anterior)
         if ($currentPage > 1) {
             $prevPage = $currentPage - 1;
-            $sortida .= '<a class="btn prev" href="index.php?page=' . $prevPage . $perParam . '" rel="prev"><button type="button">Anterior</button></a> ';
+            $sortida .= '<a class="btn prev" href="index.php?page=' . $prevPage . $perParam . $sortParam . $dirParam . '" rel="prev"><button type="button">◀</button></a> ';
         }
 
         // Números de pagina
@@ -117,14 +124,14 @@ function generar_paginacio($currentPage = 1, $articlesPerPagina = 3) {
             if ($i == $currentPage) {
                 $sortida .= '<span class="page-number active">' . $i . '</span> ';
             } else {
-                $sortida .= '<a class="page-number" href="index.php?page=' . $i . $perParam . '">' . $i . '</a> ';
+                $sortida .= '<a class="page-number" href="index.php?page=' . $i . $perParam . $sortParam . $dirParam . '">' . $i . '</a> ';
             }
         }
 
         // Botó Següent (només si hi ha pagina següent)
         if ($currentPage < $totalPagines) {
             $nextPage = $currentPage + 1;
-            $sortida .= '<a class="btn next" href="index.php?page=' . $nextPage . $perParam . '" rel="next"><button type="button">Següent</button></a>';
+            $sortida .= '<a class="btn next" href="index.php?page=' . $nextPage . $perParam . $sortParam . $dirParam . '" rel="next"><button type="button">▶</button></a>';
         }
 
         $sortida .= '</div>';

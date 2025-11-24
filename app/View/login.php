@@ -38,7 +38,7 @@
     <section class="login-section">
         <div class="login-columns">
             <div class="col-left">
-                <img src="./../../public/assets/img/GT3RSrec.png" alt="GT3RSrec" class="login-image">
+                <img src="./../../public/assets/img/GT3RSrec.png" alt="Porsche GT3 RS" class="login-image">
             </div>
             <div class="col-right">
                 <h2 class="login-title">Iniciar sessió</h2>
@@ -64,9 +64,13 @@
 
                     <button type="submit">Iniciar sessió</button>
                 </form>
-                <p>No tens compte? <a style="color: blue;" href="register.php">Registra't aquí</a></p>
             </div>
-            
+        </div>
+        <div class="login-footer">
+            <span class="login-text">No tens compte? <a style="color: blue;" href="register.php">Registra't aquí</a></span>
+            <span>&nbsp;&nbsp;&nbsp;</span>
+            <input type="checkbox" id="rememberMe" name="rememberMe">
+            <span class="login-text"> Remember Me</span>
         </div>
     </section>
 </body>

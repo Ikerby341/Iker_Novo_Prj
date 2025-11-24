@@ -48,13 +48,35 @@
             // Mostrar input per a articles per pàgina (entrada lliure)
             $currentPerPage = isset($_GET['per_page']) && is_numeric($_GET['per_page']) ? (int)$_GET['per_page'] : 3;
         ?>
+            
+            <?php
+                $per = isset($_GET['per_page']) ? (int)$_GET['per_page'] : $currentPerPage;
+                $base = 'index.php?per_page=' . urlencode($per) . '&page=1';
+                $curSort = isset($_GET['sort']) ? $_GET['sort'] : '';
+                $curDir = isset($_GET['dir']) ? strtoupper($_GET['dir']) : '';
+            ?>
 
-            <form method="get" id="perPageForm" style="margin-bottom:16px; text-align:right;">
-                <label for="per_page">Articles per pàgina: </label>
-                <input type="number" id="per_page" name="per_page" value="<?php echo $currentPerPage; ?>" min="1" max="100" style="width:40px; text-align:center;" />
-                <input type="hidden" name="page" value="1">
-                <button type="submit">Aplicar</button>
-            </form>
+            <div class="controls-row">
+                <div class="controls-item">
+                    <label for="orderby" class="controls-label">Ordenar per:</label>
+                    <select id="orderby" name="orderby" class="controls-select" onchange="if(this.value) location = this.value;">
+                        <option value="<?php echo $base; ?>"<?php echo ($curSort==='' ? ' selected' : ''); ?>>Per defecte</option>
+                        <option value="<?php echo $base . '&sort=marca&dir=ASC'; ?>"<?php echo ($curSort==='marca' && $curDir==='ASC' ? ' selected' : ''); ?>>Marca (Asc)</option>
+                        <option value="<?php echo $base . '&sort=marca&dir=DESC'; ?>"<?php echo ($curSort==='marca' && $curDir==='DESC' ? ' selected' : ''); ?>>Marca (Desc)</option>
+                        <option value="<?php echo $base . '&sort=model&dir=ASC'; ?>"<?php echo ($curSort==='model' && $curDir==='ASC' ? ' selected' : ''); ?>>Model (Asc)</option>
+                        <option value="<?php echo $base . '&sort=model&dir=DESC'; ?>"<?php echo ($curSort==='model' && $curDir==='DESC' ? ' selected' : ''); ?>>Model (Desc)</option>
+                    </select>
+                </div>
+
+                <form method="get" id="perPageForm" class="controls-item controls-form">
+                    <label for="per_page" class="controls-label">Articles per pàgina:</label>
+                    <input type="number" id="per_page" name="per_page" class="controls-input" value="<?php echo $currentPerPage; ?>" min="1" max="100" />
+                    <input type="hidden" name="page" value="1">
+                    <input type="hidden" name="sort" value="<?php echo htmlspecialchars($curSort); ?>">
+                    <input type="hidden" name="dir" value="<?php echo htmlspecialchars($curDir); ?>">
+                    <button type="submit" class="controls-button">Aplicar</button>
+                </form>
+            </div>
 
         <?php
             echo mostrar_articles();  
@@ -98,5 +120,22 @@
             });
         })();
     </script>
+    <?php
+        // Si l'usuari està logat, establim un temporitzador client-side
+        // perquè la pàgina es recarregui quan la sessió caduqui al servidor.
+        if (is_logged_in() && isset($_SESSION['last_activity'])) {
+            $remaining = SESSION_TIMEOUT_SECONDS - (time() - $_SESSION['last_activity']);
+            if ($remaining < 0) $remaining = 0;
+    ?>
+    <script>
+        (function(){
+            var remaining = <?php echo (int)$remaining; ?>; // segons
+            // Afegim un petit marge d'1s per assegurar-nos que el servidor ja hagi invalidat la sessió
+            var ms = (remaining + 1) * 1000;
+            // Programem recarrega automàtica
+            setTimeout(function(){ try { location.reload(); } catch(e) { /* ignore */ } }, ms);
+        })();
+    </script>
+    <?php } ?>
 </body>
 </html>

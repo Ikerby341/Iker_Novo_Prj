@@ -59,7 +59,23 @@ function obtenir_pagina_actual() {
 function mostrar_articles($articlesPerPagina = 3) {
     $page = obtenir_pagina_actual();
     $perPage = obtenir_per_pagina($articlesPerPagina);
-    return generar_articles($page, $perPage);
+    // Llegim opcions d'ordenació de la query string i validem-les
+    $allowedFields = ['ID', 'marca', 'model'];
+    $sort = 'ID';
+    $dir = 'ASC';
+    if (isset($_GET['sort'])) {
+        $candidate = trim($_GET['sort']);
+        // Normalitzem a minuscules i comparem amb llista d'equivalències
+        $map = ['id' => 'ID', 'marca' => 'marca', 'model' => 'model'];
+        $lk = strtolower($candidate);
+        if (isset($map[$lk])) $sort = $map[$lk];
+    }
+    if (isset($_GET['dir'])) {
+        $d = strtoupper(trim($_GET['dir']));
+        if (in_array($d, ['ASC','DESC'])) $dir = $d;
+    }
+
+    return generar_articles($page, $perPage, $sort, $dir);
 }
 
 /**
@@ -69,7 +85,20 @@ function mostrar_articles($articlesPerPagina = 3) {
 function mostrar_paginacio($articlesPerPagina = 3) {
     $page = obtenir_pagina_actual();
     $perPage = obtenir_per_pagina($articlesPerPagina);
-    return generar_paginacio($page, $perPage);
+    // Incorporem la mateixa lògica d'ordenació per mantenir els paràmetres en la paginació
+    $sort = 'ID';
+    $dir = 'ASC';
+    if (isset($_GET['sort'])) {
+        $map = ['id' => 'ID', 'marca' => 'marca', 'model' => 'model'];
+        $lk = strtolower(trim($_GET['sort']));
+        if (isset($map[$lk])) $sort = $map[$lk];
+    }
+    if (isset($_GET['dir'])) {
+        $d = strtoupper(trim($_GET['dir']));
+        if (in_array($d, ['ASC','DESC'])) $dir = $d;
+    }
+
+    return generar_paginacio($page, $perPage, $sort, $dir);
 }
 
 /**

@@ -345,6 +345,9 @@ footer {
 .col-left {
   flex: 0 0 360px;
   max-width: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .col-left .login-image {
@@ -392,6 +395,40 @@ footer {
   text-align: center;
 }
 
+/* Controls row: ordenar + per-page en la mateixa línia i amb mateix format */
+.controls-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.controls-item { display: inline-flex; align-items: center; gap: 8px; }
+
+.controls-label { font-weight: 600; color: #14213d; }
+
+.controls-select, .controls-input, .controls-button {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #d0d7e6;
+  background: #ffffff;
+  color: #14213d;
+  font-weight: 600;
+}
+
+.controls-select { min-width: 180px; }
+.controls-input { width: 64px; text-align: center; }
+.controls-button { background: #0055a5; color: #fff; border: none; cursor: pointer; }
+.controls-button:hover { background: #0974ff; }
+
+@media (max-width: 720px) {
+  .controls-row { flex-direction: column; align-items: stretch; }
+  .controls-item { justify-content: space-between; }
+  .controls-select { width: 100%; }
+  .controls-form { justify-content: flex-start; gap: 8px; }
+}
+
 /* Artículo: fila con contenido a la izquierda y acciones a la derecha */
 .article-row {
   display: flex;
@@ -428,4 +465,33 @@ footer {
 @media (max-width: 720px) {
   .article-row { flex-direction: column; align-items: stretch; }
   .article-actions { justify-content: flex-start; margin-top: 10px; }
+}
+
+.login-footer {
+  text-align: center;
+  padding-top: 16px;
+  padding-bottom: 2rem;
+  margin-top: 0;
+}
+
+.login-footer input[type="checkbox"] {
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.login-text {
+  display: inline;
+  vertical-align: middle;
+  margin-right: 12px;
+  color: #14213d;
+  font-size: 14px;
+}
+
+.login-text a {
+  color: #0055a5;
+  text-decoration: underline;
+}
+
+.login-text a:hover {
+  color: #0974ff;
 }
