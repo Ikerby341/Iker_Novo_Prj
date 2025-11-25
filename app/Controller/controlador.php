@@ -1,4 +1,10 @@
 <?php
+
+// Cargar configuración de la aplicación (BASE_URL, etc.)
+if (file_exists(__DIR__ . '/../../config/app.php')) {
+    include_once __DIR__ . '/../../config/app.php';
+}
+
 include_once __DIR__ .'/../Model/modelo.php';
 
 // Session handling: start session and enforce timeout

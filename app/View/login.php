@@ -13,7 +13,7 @@
         $result = login_user($username, $password, $remember);
         if ($result['success']) {
             // Login correcto: redirige a la vista principal
-            header('Location: /practiques/backend/Iker_Novo_Prj/');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
             exit;
         } else {
             // Errores: guardar para mostrar
@@ -27,19 +27,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar sessió</title>
-    <link rel="stylesheet" href="./../../resources/styles/style.css">
+    <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>resources/styles/style.css">
 </head>
 <body>
     <header>
         <div class="header-inner">
-            <a href="./../../index.php" class="menu">🏠 Home</a>
+            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>" class="menu">🏠 Home</a>
         </div>
     </header>
     
     <section class="login-section">
         <div class="login-columns">
-            <div class="col-left">
-                <img src="./../../public/assets/img/GT3RSrec.png" alt="Porsche GT3 RS" class="login-image">
+                <div class="col-left">
+                <img src="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>public/assets/img/GT3RSrec.png" alt="Porsche GT3 RS" class="login-image">
             </div>
             <div class="col-right">
                 <h2 class="login-title">Iniciar sessió</h2>

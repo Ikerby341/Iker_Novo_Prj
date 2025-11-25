@@ -54,11 +54,11 @@ function generar_articles($page = 1, $articlesPerPagina = 3, $sort = 'ID', $dir 
 
             if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['user_id']) && $ownerId !== null && $_SESSION['user_id'] === $ownerId) {
                 $sortida .= '<div class="article-actions">';
-                $sortida .= '<form method="post" action="/practiques/backend/Iker_Novo_PrJ/app/View/update.php">';
+                $sortida .= '<form method="post" action="app/View/update.php">';
                 $sortida .= '<input type="hidden" name="id" value="' . $id . '">';
                 $sortida .= '<button type="submit" class="edit-btn" title="Editar">✏️</button>';
                 $sortida .= '</form>';
-                $sortida .= '<form method="post" action="/practiques/backend/Iker_Novo_PrJ/app/View/delete.php">';
+                $sortida .= '<form method="post" action="app/View/delete.php">';
                 $sortida .= '<input type="hidden" name="id" value="' . $id . '">';
                 $sortida .= '<button type="submit" class="delete-btn" title="Esborrar">🗑️</button>';
                 $sortida .= '</form>';

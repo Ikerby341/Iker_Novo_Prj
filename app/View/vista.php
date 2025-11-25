@@ -9,27 +9,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projecte Iker Novo</title>
-    <link rel="stylesheet" href="/practiques/backend/Iker_Novo_Prj/resources/styles/style.css">
+    <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>resources/styles/style.css">
 </head>
 <body>
     <header>
         <div class="header-inner">
-            <a href="index.php" class="menu">🏠 Home</a>
+            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>" class="menu">🏠 Home</a>
             <div class="header-right">
                 <?php if (is_logged_in()): ?>
                     <div class="signin" id="signin">
                         <button id="signinBtn" class="signin-btn" aria-haspopup="true" aria-expanded="false">👤 <?php echo htmlspecialchars($_SESSION['username']); ?></button>
                         <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
-                                <a href="./app/View/create.php">Crear articles</a>
-                                <a href="./app/Controller/logout.php">Tancar sessió</a>
+                            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/create.php">Crear articles</a>
+                            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/Controller/logout.php">Tancar sessió</a>
                         </div>
                     </div>
                 <?php else: ?>
                     <div class="signin" id="signin">
                         <button id="signinBtn" class="signin-btn" aria-haspopup="true" aria-expanded="false">🔐 Sign-in</button>
                         <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
-                            <a href="./app/View/login.php">Iniciar sessió</a>
-                                <a href="./app/View/register.php">Registrar-se</a>
+                            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/login.php">Iniciar sessió</a>
+                                <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/register.php">Registrar-se</a>
                         </div>
                     </div>
                 <?php endif; ?>

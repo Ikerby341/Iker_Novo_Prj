@@ -6,14 +6,14 @@ include_once __DIR__ . '/../Controller/CRUDcontroller.php';
 // Protegim l'accés: aquesta pàgina només es pot accedir via POST per esborrar
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     // Redirigim a la vista principal (no permetem GET)
-    header('Location: /practiques/backend/Iker_Novo_PrJ/');
+    header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
     exit;
 }
 
 // Ara processem la petició POST
 // Verifiquem que l'usuari està identificat
-if (!is_logged_in()) {
-    header('Location: /practiques/backend/Iker_Novo_PrJ/app/View/login.php');
+    if (!is_logged_in()) {
+    header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/login.php' : '/app/View/login.php'));
     exit;
 }
 
@@ -22,7 +22,7 @@ $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
 if ($id <= 0) {
     $missatge = 'ID invàlida';
     $_SESSION['flash'] = $missatge;
-    header('Location: /practiques/backend/Iker_Novo_PrJ/');
+    header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
     exit;
 }
 
@@ -35,13 +35,13 @@ if ($id <= 0) {
     if (!$row) {
         $missatge = 'Article no trobat';
         $_SESSION['flash'] = $missatge;
-        header('Location: /practiques/backend/Iker_Novo_PrJ/');
+        header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
         exit;
     }
     if ((int)$row['owner_id'] !== (int)($_SESSION['user_id'] ?? 0)) {
         $missatge = 'No tens permís per esborrar aquest article';
         $_SESSION['flash'] = $missatge;
-        header('Location: /practiques/backend/Iker_Novo_PrJ/');
+        header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
         exit;
     }
 
@@ -49,11 +49,11 @@ if ($id <= 0) {
     $missatge = esborrarDada($id);
     // Guardar missatge en sessió i redirigir a la vista principal
     $_SESSION['flash'] = $missatge;
-    header('Location: /practiques/backend/Iker_Novo_PrJ/');
+    header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
     exit;
 } catch (PDOException $e) {
     $_SESSION['flash'] = 'Error en la base de dades: ' . $e->getMessage();
-    header('Location: /practiques/backend/Iker_Novo_PrJ/');
+    header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
     exit;
 }
 ?>
@@ -65,14 +65,14 @@ if ($id <= 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Esborrar article</title>
     <!-- Enllaç als estils CSS -->
-    <link rel="stylesheet" href="./../../resources/styles/style.css">
+    <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>resources/styles/style.css">
 </head>
 <body>
     <!-- Títol principal de la pàgina -->
     <h1>Esborrar article</h1>
 
     <!-- Formulari per esborrar dades -->
-    <form method="POST" action="/practiques/backend/Iker_Novo_PrJ/">
+    <form method="POST" action="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>">
         <!-- Camp per l'ID del registre a esborrar -->
         <label hidden>Digues una ID per eliminar:</label><br>
         <input type="number" name="id" style="width: 50px; text-align: center;" required hidden>
@@ -86,6 +86,6 @@ if ($id <= 0) {
     </div>
 
     <!-- Botó per tornar a la pàgina principal -->
-    <button class="box" style="width: auto;" onclick="location.href='./../../index.php';">← Tornar enrere</button>
+    <button class="box" style="width: auto;" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>
 </body>
 </html>

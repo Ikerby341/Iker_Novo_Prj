@@ -51,43 +51,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Actualitzar article</title>
     <!-- Enllaç als estils CSS -->
-    <link rel="stylesheet" href="./../../resources/styles/style.css">
+    <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>resources/styles/style.css">
 </head>
 <body>
     <!-- Títol principal de la pàgina -->
     <h1>Actualitzar article</h1>
 
-    <section class="CRUD-section">
-        <!-- Contenidor per mostrar missatges de resposta -->    
-        <div>
-            <?php echo $missatge; ?>
-        </div>
-        <!-- Formulari per modificar dades existents -->
-        <form method="POST" action="">
-            <!-- Camp per l'ID del registre a modificar -->
-            <?php if ($id !== null && $id > 0): ?>
-                <input type="hidden" name="id" value="<?php echo htmlspecialchars($id, ENT_QUOTES); ?>">
-                <p>ID: <?php echo htmlspecialchars($id, ENT_QUOTES); ?></p>
-            <?php else: ?>
-                <p>Selecciona un article per modificar des de la llista (usa el botó ✏️ al costat de l'article).</p>
-                <p><a style="color: #65a6fc" href="./../../index.php">← Volver a la lista</a></p>
-                <?php
-                    // No mostramos el formulario si no hay id: salir para evitar que el usuario modifique ID manualmente
-                    exit;
-                ?>
-            <?php endif; ?>
-            <!-- Camp per especificar quin camp es vol modificar -->
-            <label>Nom del camp:</label><br>
-            <input type="text" name="camp" required><br>
-            <!-- Camp per la nova dada que s'inserirà -->
-            <label>Dada nova:</label><br>
-            <input type="text" name="dadaN" required><br><br>
-            <!-- Botó per enviar el formulari -->
-            <button class="principalBox" type="submit" name="confirm_modify" value="1" style="width: auto;">Modificar ⚙️</button>
-        </form>
-        <br>
-        <!-- Botó per tornar a la pàgina principal -->
-        <button class="box" style="width: auto;" onclick="location.href='./../../index.php';">← Tornar enrere</button>
+    <section class="CRUD-section form-container-adapted">
+            <!-- Contenidor per mostrar missatges de resposta -->    
+            <div>
+                <?php echo $missatge; ?>
+            </div>
+            <!-- Formulari per modificar dades existents -->
+            <form method="POST" action="">
+                <!-- Camp per l'ID del registre a modificar -->
+                <?php if ($id !== null && $id > 0): ?>
+                    <input type="hidden" name="id" value="<?php echo htmlspecialchars($id, ENT_QUOTES); ?>">
+                    <p>ID: <?php echo htmlspecialchars($id, ENT_QUOTES); ?></p>
+                <?php else: ?>
+                    <p>Selecciona un article per modificar des de la llista (usa el botó ✏️ al costat de l'article).</p>
+                    <p><a style="color: #65a6fc" href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>">← Volver a la lista</a></p>
+                    <?php
+                        // No mostramos el formulario si no hay id: salir para evitar que el usuario modifique ID manualmente
+                        exit;
+                    ?>
+                <?php endif; ?>
+                <!-- Camp per especificar quin camp es vol modificar -->
+                <label>Nom del camp:</label><br>
+                <input type="text" name="camp" required><br>
+                <!-- Camp per la nova dada que s'inserirà -->
+                <label>Dada nova:</label><br>
+                <input type="text" name="dadaN" required><br>
+                <div class="button-row">
+                    <!-- Botó per tornar a la pàgina principal -->
+                    <button class="box" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>
+                    <!-- Botó per enviar el formulari -->
+                    <button class="principalBox" type="submit" name="confirm_modify" value="1">Modificar ⚙️</button>
+                </div>                
+            </form>
     </section>
 </body>
 </html>

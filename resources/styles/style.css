@@ -495,3 +495,82 @@ footer {
 .login-text a:hover {
   color: #0974ff;
 }
+
+.form-container {
+  max-width: 50%;
+  background: white;
+  margin: 0 auto;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.form-container input[type="text"] {
+  font-size: 1.1rem;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 15px;
+}
+
+/* New styles for section adapted without form-container div */
+.form-container-adapted {
+  max-width: 50%;
+  background: white;
+  margin: 0 auto;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+/* Improve inputs style */
+.form-container-adapted input[type="text"] {
+  font-size: 1.1rem;
+  padding: 12px 15px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 18px;
+  border-radius: 6px;
+  border: 1.5px solid #ccc;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-container-adapted input[type="text"]:focus {
+  border-color: #0055a5;
+  box-shadow: 0 0 8px rgba(0, 85, 165, 0.5);
+  outline: none;
+}
+
+/* Button row: place buttons at two edges */
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+}
+
+/* Optional: extra spacing for individual buttons */
+.button-row .box {
+  background-color: #888;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.button-row .box:hover {
+  background-color: #555;
+}
+
+.button-row .principalBox {
+  background-color: #0055a5;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.button-row .principalBox:hover {
+  background-color: #0974ff;
+}

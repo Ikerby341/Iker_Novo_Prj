@@ -1,4 +1,4 @@
 <?php
 include_once __DIR__ . '/controlador.php';
-logout_user('/practiques/backend/Iker_Novo_PrJ/');
+logout_user(defined('BASE_URL') ? BASE_URL : '/');
 ?>

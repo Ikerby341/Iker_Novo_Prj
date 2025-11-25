@@ -13,7 +13,7 @@
         
         $result = register_user($username, $email, $password, $passwordC);
         if ($result['success']) {
-            header('Location: /practiques/backend/Iker_Novo_Prj/app/View/login.php');
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/login.php' : '/app/View/login.php'));
             exit;
         } else {
             $errors = $result['errors'];
@@ -28,19 +28,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar sessió</title>
-    <link rel="stylesheet" href="./../../resources/styles/style.css">
+    <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>resources/styles/style.css">
 </head>
 <body>
     <header>
         <div class="header-inner">
-            <a href="./../../index.php" class="menu">🏠 Home</a>
+            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>" class="menu">🏠 Home</a>
         </div>
     </header>
     
     <section class="login-section">
         <div class="login-columns">
             <div class="col-left">
-                <img src="./../../public/assets/img/UrusREC.png" alt="Lambroghini Urus" class="login-image">
+                <img src="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>public/assets/img/UrusREC.png" alt="Lambroghini Urus" class="login-image">
             </div>
             <div class="col-right">
                 <h2 class="login-title">Registrar-se</h2>
