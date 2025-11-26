@@ -68,6 +68,7 @@ if ($id <= 0) {
     <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>resources/styles/style.css">
 </head>
 <body>
+    <div class="site-content">
     <!-- Títol principal de la pàgina -->
     <h1>Esborrar article</h1>
 
@@ -87,5 +88,12 @@ if ($id <= 0) {
 
     <!-- Botó per tornar a la pàgina principal -->
     <button class="box" style="width: auto;" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-text">Pàgina feta per Iker Novo Oliva</div>
+            <div class="footer-small">Gràcies per visitar · 2025</div>
+        </div>
+    </footer>
 </body>
 </html>

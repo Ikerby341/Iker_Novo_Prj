@@ -36,7 +36,8 @@
             <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>" class="menu">🏠 Home</a>
         </div>
     </header>
-    
+    <div class="site-content">
+
     <section class="login-section">
         <div class="login-columns">
                 <div class="col-left">
@@ -73,7 +74,7 @@
                     
                     <label style="display:inline-flex; align-items:center; gap:6px;">
                         <input type="checkbox" id="rememberMe" name="rememberMe" value="1">
-                        <span class="login-text"> Remember Me</span>
+                        <span class="login-text"> Recorda'm</span>
                     </label>
                 </form>
                 </div>
@@ -83,5 +84,12 @@
             <span class="login-text">No tens compte? <a style="color: blue;" href="register.php">Registra't aquí</a></span>
         </div>
     </section>
-</body>
-</html>
+    </div>
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <div class="footer-text">Pàgina feta per Iker Novo Oliva</div>
+                <div class="footer-small">Gràcies per visitar · 2025</div>
+            </div>
+        </footer>
+    </body>
+    </html>

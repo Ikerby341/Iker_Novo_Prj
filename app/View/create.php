@@ -30,13 +30,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>" class="menu">🏠 Home</a>
         </div>
     </header>
+    <div class="site-content">
     <!-- Títol principal de la pàgina -->
     <h1 style="text-align: center;">Crear article</h1>
     <section class="CRUD-section form-container-adapted">
         <!-- Contenidor per mostrar missatges de resposta -->
-        <div>
-            <?php echo $missatge; ?>
-        </div>
+        <?php if (!empty($missatge)): ?>
+            <div class="form-info"><span class="info-icon">ℹ️</span><span class="info-text"><?php echo htmlspecialchars($missatge); ?></span></div>
+        <?php endif; ?>
         <!-- Formulari per inserir noves dades -->
         <form method="POST" action="">
             <!-- Camp pel títol -->
@@ -53,5 +54,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </form>
     </section>
+    </div>
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <div class="footer-text">Pàgina feta per Iker Novo Oliva</div>
+                <div class="footer-small">Gràcies per visitar · 2025</div>
+            </div>
+        </footer>
 </body>
 </html>

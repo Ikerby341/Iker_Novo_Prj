@@ -37,6 +37,7 @@
             <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>" class="menu">🏠 Home</a>
         </div>
     </header>
+    <div class="site-content">
     
     <section class="login-section">
         <div class="login-columns">
@@ -90,5 +91,12 @@
             <p class="login-text">Ja tens compte? <a style="color: blue;" href="login.php">Inicia sessió aquí</a></p>
         </div>
     </section>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-text">Pàgina feta per Iker Novo Oliva</div>
+            <div class="footer-small">Gràcies per visitar · 2025</div>
+        </div>
+    </footer>
 </body>
 </html>

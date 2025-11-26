@@ -36,12 +36,14 @@
             </div>
         </div>
     </header>
+    <div class="site-content">
     <h1>Cotxes</h1>
     <div class="divPrincipal">
         <?php
-            // Mostrar mensaje flash si existe
+            // Mostrar mensaje flash si existe (usar formato informacional azul similar a .form-errors)
             if (isset($_SESSION['flash']) && $_SESSION['flash'] !== '') {
-                echo '<div class="flash-message" style="padding:10px;margin-bottom:10px;background:#f8f9fa;border:1px solid #ddd;border-radius:4px; color: pink;">' . htmlspecialchars($_SESSION['flash']) . '</div>';
+                $msg = htmlspecialchars($_SESSION['flash']);
+                echo '<div class="form-info"><span class="info-icon">ℹ️</span><span class="info-text">' . $msg . '</span></div>';
                 unset($_SESSION['flash']);
             }
 
@@ -82,11 +84,12 @@
             echo mostrar_articles();  
         ?>
     </div>
-    <div class="divPrincipal">
-        <?php
-            echo mostrar_paginacio();
-        ?>
+
+    <!-- Paginació: es mostra abans del footer i no es mou amb el contingut -->
+    <div class="fixed-pagination">
+        <?php echo mostrar_paginacio(); ?>
     </div>
+    </div> <!-- .site-content -->
     
     <script>
         // Dropdown para Sign-in: abre/cierra y cierra al click fuera o ESC
@@ -137,5 +140,11 @@
         })();
     </script>
     <?php } ?>
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-text">Pàgina feta per Iker Novo Oliva</div>
+            <div class="footer-small">Gràcies per visitar · 2025</div>
+        </div>
+    </footer>
 </body>
 </html>
