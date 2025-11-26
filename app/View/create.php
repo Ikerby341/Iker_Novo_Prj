@@ -25,9 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>resources/styles/style.css">
 </head>
 <body>
+    <header>
+        <div class="header-inner">
+            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>" class="menu">🏠 Home</a>
+        </div>
+    </header>
     <!-- Títol principal de la pàgina -->
-    <h1>Crear article</h1>
-<section class="CRUD-section form-container-adapted">
+    <h1 style="text-align: center;">Crear article</h1>
+    <section class="CRUD-section form-container-adapted">
         <!-- Contenidor per mostrar missatges de resposta -->
         <div>
             <?php echo $missatge; ?>
@@ -47,6 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button class="principalBox" type="submit">Insertar ⛳</button>
             </div>
         </form>
-</section>
+    </section>
 </body>
 </html>

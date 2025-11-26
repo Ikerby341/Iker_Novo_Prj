@@ -5,7 +5,44 @@ if (file_exists(__DIR__ . '/../../config/app.php')) {
     include_once __DIR__ . '/../../config/app.php';
 }
 
+/**
+ * verify_recaptcha
+ * Verifica el token de Google reCAPTCHA (server-side).
+ * Retorna true si la verificació és correcta.
+ */
+function verify_recaptcha($token) {
+    // Require secret to be defined in config/recaptcha.php
+    if (!defined('RECAPTCHA_SECRET') || empty(RECAPTCHA_SECRET)) return false;
+
+    $url = 'https://www.google.com/recaptcha/api/siteverify';
+    $data = http_build_query([
+        'secret' => RECAPTCHA_SECRET,
+        'response' => $token,
+        'remoteip' => $_SERVER['REMOTE_ADDR'] ?? null
+    ]);
+
+    $opts = [
+        'http' => [
+            'method'  => 'POST',
+            'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+            'content' => $data,
+            'timeout' => 5
+        ]
+    ];
+
+    $context  = stream_context_create($opts);
+    $result = @file_get_contents($url, false, $context);
+    if ($result === false) return false;
+
+    $json = json_decode($result, true);
+    return isset($json['success']) && $json['success'] === true;
+}
+
 include_once __DIR__ .'/../Model/modelo.php';
+// recaptcha config (secret)
+if (file_exists(__DIR__ . '/../../config/recaptcha.php')) {
+    include_once __DIR__ . '/../../config/recaptcha.php';
+}
 
 // Session handling: start session and enforce timeout
 if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -243,6 +280,16 @@ function register_user($username, $email, $password, $password_confirm) {
     $pwErrors = validar_contrasenya($password);
     if (!empty($pwErrors)) $errors = array_merge($errors, $pwErrors);
 
+    // verificar reCAPTCHA (server-side)
+    $recToken = $_POST['g-recaptcha-response'] ?? null;
+    if (empty($recToken)) {
+        $errors[] = 'ReCAPTCHA requerit. Si us plau, marca la casella i torna-ho a provar.';
+    } else {
+        if (!function_exists('verify_recaptcha') || !verify_recaptcha($recToken)) {
+            $errors[] = 'Verificació reCAPTCHA fallida. Si us plau, torna-ho a provar.';
+        }
+    }
+
     if (!empty($errors)) {
         return ['success' => false, 'errors' => $errors];
     }
@@ -276,6 +323,16 @@ function login_user($username, $password, $remember = false) {
 
     $user = get_user_by_username($username);
     if (!$user) return ['success' => false, 'errors' => ['Aquest usuari no existeix.']];
+
+    // verificar reCAPTCHA (si s'envia el token des del formulari)
+    $recToken = $_POST['g-recaptcha-response'] ?? null;
+    if (empty($recToken)) {
+        return ['success' => false, 'errors' => ['ReCAPTCHA requerit. Si us plau, marca la casella i torna-ho a provar.']];
+    }
+    // verify server-side
+    if (!function_exists('verify_recaptcha') || !verify_recaptcha($recToken)) {
+        return ['success' => false, 'errors' => ['Verificació reCAPTCHA fallida. Si us plau, torna-ho a provar.']];
+    }
 
     // verificar contrasenya
     $stored = $user['password'];

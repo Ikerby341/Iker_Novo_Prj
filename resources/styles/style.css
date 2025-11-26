@@ -330,7 +330,8 @@ footer {
 }
 
 .login-section {
-  max-width: 600px;
+  /* Increased width to fit reCAPTCHA comfortably */
+  max-width: 820px;
   margin: 40px auto;
   padding: 0;
 }
@@ -343,8 +344,8 @@ footer {
 }
 
 .col-left {
-  flex: 0 0 360px;
-  max-width: 360px;
+  flex: 0 0 320px;
+  max-width: 320px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -358,8 +359,63 @@ footer {
 }
 
 .col-right {
-  flex: 1 1 auto;
+  /* Slightly reduced right column so form width matches the reCAPTCHA */
+  flex: 1 1 360px;
+  min-width: 360px;
   padding: 24px;
+}
+
+/* Reusable input styling similar to the articles per-page control */
+.nice-input, .nice-select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #d0d7e6;
+  background: #ffffff;
+  color: #14213d;
+  font-weight: 600;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.nice-input:focus, .nice-select:focus {
+  border-color: #0055a5;
+  box-shadow: 0 0 8px rgba(0, 85, 165, 0.15);
+  outline: none;
+}
+
+/* Error display: make validation errors red and noticeable */
+.form-errors {
+  color: #b00020;
+  background: #fff5f6;
+  border: 1px solid rgba(176,0,32,0.12);
+  padding: 12px 14px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+.form-errors ul { list-style: disc; margin-left: 18px; }
+.form-errors ul li { color: #b00020; margin-bottom: 6px; }
+
+/* Ensure the reCAPTCHA widget has room and aligns with inputs */
+.g-recaptcha {
+  transform-origin: left top;
+  /* small responsive tweak if needed */
+}
+
+/* Wrap form contents so inputs and the reCAPTCHA share the same width */
+.form-inner {
+  width: 320px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.g-recaptcha {
+  width: 320px;
+}
+
+@media (max-width: 720px) {
+  .col-right { min-width: 0; padding: 18px; }
+  .form-inner { width: 100%; padding: 0; }
+  .g-recaptcha { width: 100%; transform: none; }
 }
 
 .login-title {
