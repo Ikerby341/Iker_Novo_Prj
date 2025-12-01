@@ -16,7 +16,7 @@ Funcionalitats principals
   - Formularis `login` i `register` inclouen el widget client-side.
   - Verificació server-side mitjançant la clau secreta en `config/recaptcha.php`.
 
-- CRUD sense JavaScript obligatori
+- CRUD
   - Crear, llegir, actualitzar i eliminar articles (cotxes) amb control d'accés basat en propietat (owner_id).
   - Les operacions d'editar i esborrar es fan via formularis POST per evitar dependència de JS.
 
@@ -24,6 +24,10 @@ Funcionalitats principals
   - Paginació d'articles amb paràmetres `page` i `per_page` gestionats des del controlador.
   - Controls d'ordenació (`sort`, `dir`) amb whitelist per prevenir injeccions SQL.
   - Control d'entrada lliure per `Articles per pàgina` que manté la paginació i els paràmetres d'ordenació.
+
+- Gestió de rutes
+  - El projecte utilitza una constant `BASE_URL` per construir enllaços i rutes dins de les vistes i includes. Això evita rutes absolutes que depenguin d'una màquina o d'una estructura concreta de carpetes.
+  - Per què s'ha creat: perquè l'aplicació funcioni correctament des de qualsevol màquina (localhost, un directori dins d'un servidor, o un entorn amb domini propi) sense haver de canviar manualment tots els enllaços de les vistes (Vaig haver d'afegir-ho ja que des de l'ordinador de casa no funcionaba i vaig veure que sense això depenia molt de que les rutes siguin les mateixes que les del meu portatil i això no ha de ser així).
 
 Estructura de fitxers rellevant
 -------------------------------
