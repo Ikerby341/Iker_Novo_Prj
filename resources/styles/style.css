@@ -72,7 +72,7 @@ a {
 }
 
 a:hover {
-  color: #0974ff;
+  color: #5CB0FF;
 }
 
 button {
@@ -86,7 +86,7 @@ button {
 }
 
 button:hover {
-  background-color: #0974ff;
+  background-color: #5CB0FF;
 }
 
 /* Columnas para la lista de marcas */
@@ -244,7 +244,7 @@ footer {
 }
 
 .paginacio .btn button:hover {
-  background-color: #0974ff;
+  background-color: #5CB0FF;
 }
 
 .paginacio .page-number {
@@ -256,20 +256,20 @@ footer {
   padding: 0;
   border-radius: 6px;
   text-align: center;
-  background: transparent;
-  color: #0055a5;
+  background: #0055a5;
+  color: #fff;
   border: 1px solid transparent;
 }
 
 .paginacio .page-number:hover {
-  background: #e9f0ff;
+  background: #5CB0FF;
 }
 
 .paginacio .page-number.active {
-  background: #0055a5;
+  background: #5CB0FF;
   color: #fff;
   font-weight: 700;
-  border-color: #0055a5;
+  border-color: #5CB0FF;
 }
 
 @media (max-width: 480px) {
@@ -543,7 +543,7 @@ footer {
 .controls-select { min-width: 180px; }
 .controls-input { width: 64px; text-align: center; }
 .controls-button { background: #0055a5; color: #fff; border: none; cursor: pointer; }
-.controls-button:hover { background: #0974ff; }
+.controls-button:hover { background: #5CB0FF; }
 
 @media (max-width: 720px) {
   .controls-row { flex-direction: column; align-items: stretch; }
@@ -622,7 +622,7 @@ footer {
 }
 
 .login-text a:hover {
-  color: #0974ff;
+  color: #5CB0FF;
 }
 
 .form-container {
@@ -681,7 +681,7 @@ footer {
 
 /* Optional: extra spacing for individual buttons */
 .button-row .box {
-  background-color: #888;
+  background-color: #5CB0FF;
   padding: 8px 14px;
   border-radius: 6px;
   font-weight: 600;
@@ -701,5 +701,5 @@ footer {
 }
 
 .button-row .principalBox:hover {
-  background-color: #0974ff;
+  background-color: #5CB0FF;
 }

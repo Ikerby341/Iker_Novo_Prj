@@ -11,7 +11,6 @@ if (file_exists(__DIR__ . '/../../config/app.php')) {
  * Retorna true si la verificació és correcta.
  */
 function verify_recaptcha($token) {
-    // Require secret to be defined in config/recaptcha.php
     if (!defined('RECAPTCHA_SECRET') || empty(RECAPTCHA_SECRET)) return false;
 
     $url = 'https://www.google.com/recaptcha/api/siteverify';

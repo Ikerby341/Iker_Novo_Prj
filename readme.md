@@ -35,5 +35,5 @@ Estructura de fitxers rellevant
 - `app/Controller/controlador.php` — gestió de sessions, autenticació, validacions i helpers (inclou `verify_recaptcha()` i flux de "remember me").
 - `app/Model/modelo.php` — funcions d'accés a la base de dades (articles, usuaris, token remember).
 - `app/View/` — vistes PHP: `vista.php`, `login.php`, `register.php`, `create.php`, `update.php`, `delete.php`, etc.
-- `config/recaptcha.php` — defineix `RECAPTCHA_SECRET` (no pujar la clau secreta a repositoris públics).
+- `config/recaptcha.php` — defineix `RECAPTCHA_SECRET`.
 - `resources/styles/style.css` — estils principals del projecte.
