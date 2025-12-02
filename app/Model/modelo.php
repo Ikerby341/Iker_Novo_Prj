@@ -45,14 +45,14 @@ function generar_articles($page = 1, $articlesPerPagina = 3, $sort = 'ID', $dir 
             $id = isset($fila['ID']) ? (int)$fila['ID'] : 0;
             $marca = isset($fila['marca']) ? htmlspecialchars($fila['marca']) : '';
             $model = isset($fila['model']) ? htmlspecialchars($fila['model']) : '';
-            $ownerId = isset($fila['owner_id']) ? (int)$fila['owner_id'] : null;
 
             $sortida .= '<section class="article-row">';
             $sortida .= '<div class="article-content">';
             $sortida .= "<h3>$marca</h3><p>$model</p>";
             $sortida .= '</div>';
 
-            if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['user_id']) && $ownerId !== null && $_SESSION['user_id'] === $ownerId) {
+            // Si estamos logados, mostramos los botones (porque todos los artículos son nuestros)
+            if (is_logged_in()) {
                 $sortida .= '<div class="article-actions">';
                 $sortida .= '<form method="post" action="app/View/update.php">';
                 $sortida .= '<input type="hidden" name="id" value="' . $id . '">';
