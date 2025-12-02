@@ -22,7 +22,7 @@
     }
 ?>
 
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -68,7 +68,7 @@
                     <label for="password">Contrasenya:</label>
                     <br>
                     <input class="nice-input" type="password" id="password" name="password" required><br><br>
-                    <div class="g-recaptcha" data-sitekey="6LeULxksAAAAAOp7haCI_UB1FyVg2gG2QbhN71Cu"></div>
+                    <div aria-label="captcha" class="g-recaptcha" data-sitekey="6LeULxksAAAAAOp7haCI_UB1FyVg2gG2QbhN71Cu"></div>
                     <br>
                     <button type="submit">Iniciar sessió</button>
                     

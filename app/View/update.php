@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -83,11 +83,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ?>
                 <?php endif; ?>
                 <!-- Camp per especificar quin camp es vol modificar -->
-                <label>Nom del camp:</label><br>
-                <input type="text" name="camp" required><br>
+                <label for="camp">Nom del camp:</label><br>
+                <input type="text" name="camp" id="camp" required><br>
                 <!-- Camp per la nova dada que s'inserirà -->
-                <label>Dada nova:</label><br>
-                <input type="text" name="dadaN" required><br>
+                <label for="dadaN">Dada nova:</label><br>
+                <input type="text" name="dadaN" id="dadaN" required><br>
                 <div class="button-row">
                     <!-- Botó per tornar a la pàgina principal -->
                     <button class="box" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>

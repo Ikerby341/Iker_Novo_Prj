@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,11 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Formulari per inserir noves dades -->
         <form method="POST" action="">
             <!-- Camp pel títol -->
-            <label>Marca:</label><br>
-            <input type="text" name="titol" required><br>
+            <label for="titol">Marca:</label><br>
+            <input type="text" name="titol" id="titol" required><br>
             <!-- Camp pel cos del missatge -->
-            <label>Model:</label><br>
-            <input type="text" name="cos" required><br>
+            <label for="cos">Model:</label><br>
+            <input type="text" name="cos" id="cos" required><br>
             <div class="button-row">
                 <!-- Botó per tornar a la pàgina principal -->
                 <button class="box" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>

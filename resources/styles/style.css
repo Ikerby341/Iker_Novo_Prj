@@ -266,10 +266,10 @@ footer {
 }
 
 .paginacio .page-number.active {
-  background: #5CB0FF;
+  background: #14213d;
   color: #fff;
   font-weight: 700;
-  border-color: #5CB0FF;
+  border-color: #14213d;
 }
 
 @media (max-width: 480px) {
