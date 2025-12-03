@@ -22,7 +22,7 @@
                         <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
                             <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/create.php">Crear articles</a>
                             <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/editprofile.php">Editar perfil</a>
-                            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/Controller/logout.php">Tancar sessió</a>
+                            <a href="<?php logout_user()?>">Tancar sessió</a>
                         </div>
                     </div>
                 <?php else: ?>

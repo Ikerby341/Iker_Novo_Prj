@@ -40,35 +40,7 @@ function generar_articles($page = 1, $articlesPerPagina = 3, $sort = 'ID', $dir 
             return "<p> No hi ha articles disponibles. </p>";
         }
 
-        $sortida = '';
-        foreach ($articles as $fila) {
-            $id = isset($fila['ID']) ? (int)$fila['ID'] : 0;
-            $marca = isset($fila['marca']) ? htmlspecialchars($fila['marca']) : '';
-            $model = isset($fila['model']) ? htmlspecialchars($fila['model']) : '';
-
-            $sortida .= '<section class="article-row">';
-            $sortida .= '<div class="article-content">';
-            $sortida .= "<h3>$marca</h3><p>$model</p>";
-            $sortida .= '</div>';
-
-            // Si estem logats, mostrem els botons (perquè tots els articles són nostres)
-            if (is_logged_in()) {
-                $sortida .= '<div class="article-actions">';
-                $sortida .= '<form method="post" action="app/View/update.php">';
-                $sortida .= '<input type="hidden" name="id" value="' . $id . '">';
-                $sortida .= '<button type="submit" class="edit-btn" title="Editar">✏️</button>';
-                $sortida .= '</form>';
-                $sortida .= '<form method="post" action="app/View/delete.php">';
-                $sortida .= '<input type="hidden" name="id" value="' . $id . '">';
-                $sortida .= '<button type="submit" class="delete-btn" title="Esborrar">🗑️</button>';
-                $sortida .= '</form>';
-                $sortida .= '</div>';
-            }
-
-            $sortida .= '</section>';
-        }
-
-        return $sortida;
+        return $articles;
 
     } catch (PDOException $e) {
         return "<h1> Error en la consulta: " . htmlspecialchars($e->getMessage()) . "</h1>";
