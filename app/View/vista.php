@@ -21,6 +21,7 @@
                         <button id="signinBtn" class="signin-btn" aria-haspopup="true" aria-expanded="false">👤 <?php echo htmlspecialchars($_SESSION['username']); ?></button>
                         <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
                             <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/create.php">Crear articles</a>
+                            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/editprofile.php">Editar perfil</a>
                             <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/Controller/logout.php">Tancar sessió</a>
                         </div>
                     </div>
@@ -29,7 +30,7 @@
                         <button id="signinBtn" class="signin-btn" aria-haspopup="true" aria-expanded="false">🔐 Sign-in</button>
                         <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
                             <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/login.php">Iniciar sessió</a>
-                                <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/register.php">Registrar-se</a>
+                            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/register.php">Registrar-se</a>
                         </div>
                     </div>
                 <?php endif; ?>
