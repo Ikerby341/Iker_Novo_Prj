@@ -1,7 +1,7 @@
 <?php
     include_once __DIR__ . '/../Controller/controlador.php';
 
-    // Procesar login si es POST
+    // Processar l'inici de sessió si és POST
     $errors = [];
     $oldUser = '';
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -12,11 +12,11 @@
 
         $result = login_user($username, $password, $remember);
         if ($result['success']) {
-            // Login correcto: redirige a la vista principal
+            // Inici de sessió correcte: redirigir a la vista principal
             header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
             exit;
         } else {
-            // Errores: guardar para mostrar
+            // Errors: desar per mostrar
             $errors = $result['errors'];
         }
     }
@@ -46,7 +46,7 @@
             <div class="col-right">
                 <h2 class="login-title">Iniciar sessió</h2>
                 <?php
-                    // Mostrar errors si existen
+                    // Mostrar errors si existeixen
                 ?>
 
                 <div class="form-inner">

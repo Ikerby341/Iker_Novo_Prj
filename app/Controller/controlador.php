@@ -1,13 +1,13 @@
 <?php
 
-// Cargar configuración de la aplicación (BASE_URL, etc.)
+// Carregar la configuració de l'aplicació (BASE_URL, etc.)
 if (file_exists(__DIR__ . '/../../config/app.php')) {
     include_once __DIR__ . '/../../config/app.php';
 }
 
 /**
  * verify_recaptcha
- * Verifica el token de Google reCAPTCHA (server-side).
+ * Verifica el token de Google reCAPTCHA (capa servidor).
  * Retorna true si la verificació és correcta.
  */
 function verify_recaptcha($token) {
@@ -38,22 +38,22 @@ function verify_recaptcha($token) {
 }
 
 include_once __DIR__ .'/../Model/modelo.php';
-// recaptcha config (secret)
+// configuració reCAPTCHA (secret)
 if (file_exists(__DIR__ . '/../../config/recaptcha.php')) {
     include_once __DIR__ . '/../../config/recaptcha.php';
 }
 
-// Session handling: start session and enforce timeout
+// Gestió de la sessió: iniciar sessió i aplicar el timeout
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-// Session timeout in seconds (40 minutes)
+// Temps d'expiració de la sessió en segons (40 minuts)
 define('SESSION_TIMEOUT_SECONDS', 40 * 60);
 
-// If last activity exists and exceeded timeout, destroy session
+// Si existeix 'last_activity' i ha superat el timeout, destruir la sessió
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > SESSION_TIMEOUT_SECONDS)) {
-    // Expired
+    // Caducada
     $_SESSION = [];
     if (ini_get("session.use_cookies")) {
         $params = session_get_cookie_params();
@@ -65,19 +65,19 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     session_destroy();
 }
 
-// If session is not active (or was destroyed) try to restore from remember-me cookie
+// Si la sessió no està activa (o s'ha destruït) intentar restaurar des de la cookie 'remember-me'
 if ((!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) && isset($_COOKIE['remember_token']) && !empty($_COOKIE['remember_token'])) {
     $cookieToken = $_COOKIE['remember_token'];
     $user = find_user_by_remember_token($cookieToken);
     if ($user) {
-        // restore session
+        // restaurar sessió
         if (session_status() !== PHP_SESSION_ACTIVE) session_start();
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['created'] = time();
         $_SESSION['last_activity'] = time();
 
-        // rotate token for safety
+        // rotar token per seguretat
         try {
             $newToken = bin2hex(random_bytes(32));
         } catch (Exception $e) {
@@ -86,12 +86,12 @@ if ((!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) && isset($_COO
         set_remember_token($user['id'], $newToken);
         setcookie('remember_token', $newToken, time() + (30*24*60*60), '/', '', false, true);
     } else {
-        // invalid token: clear cookie
+        // token invàlid: esborrar la cookie
         setcookie('remember_token', '', time() - 3600, '/', '', false, true);
     }
 }
 
-// Update last activity timestamp for active sessions
+// Actualitzar l'última activitat per a sessions actives
 if (isset($_SESSION['user_id'])) {
     $_SESSION['last_activity'] = time();
 }
@@ -230,8 +230,8 @@ function validar_pagina_solicitada() {
 }
 
 /* ----------------------------
-   Authentication helpers
-   ---------------------------- */
+    Ajuda d'autenticació
+    ---------------------------- */
 
 /**
  * validar_contrasenya

@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../config/db-connection.php';
  * genera_articles
  * Genera els articles segons la pagina actual i articles per pagina.
  * Retorna un string HTML amb els articles.
- * params: $page (int), $articlesPerPagina (int)
+ * paràmetres: $page (int), $articlesPerPagina (int)
  */
 function generar_articles($page = 1, $articlesPerPagina = 3, $sort = 'ID', $dir = 'ASC') {
     global $connexio;
@@ -51,7 +51,7 @@ function generar_articles($page = 1, $articlesPerPagina = 3, $sort = 'ID', $dir 
             $sortida .= "<h3>$marca</h3><p>$model</p>";
             $sortida .= '</div>';
 
-            // Si estamos logados, mostramos los botones (porque todos los artículos son nuestros)
+            // Si estem logats, mostrem els botons (perquè tots els articles són nostres)
             if (is_logged_in()) {
                 $sortida .= '<div class="article-actions">';
                 $sortida .= '<form method="post" action="app/View/update.php">';
@@ -83,7 +83,7 @@ function generar_articles($page = 1, $articlesPerPagina = 3, $sort = 'ID', $dir 
 function generar_paginacio($currentPage = 1, $articlesPerPagina = 3, $sort = 'ID', $dir = 'ASC') {
     global $connexio;
     try {
-        // Generar SELECT condicionat al login de l'usuari
+        // Generar SELECT condicionat a l'inici de sessió de l'usuari
         if (is_logged_in()) {
             $query = "SELECT COUNT(*) AS total FROM coches WHERE owner_id = :owner_id";
             $stmt = $connexio->prepare($query);
@@ -151,7 +151,7 @@ function obtenir_total_pagines($articlesPerPagina = 3) {
     global $connexio;
 
     try {
-        // Generar SELECT condicionat al login de l'usuari
+        // Generar SELECT condicionat a l'inici de sessió de l'usuari
         if (is_logged_in()) {
             $query = "SELECT COUNT(*) AS total FROM coches WHERE owner_id = :owner_id";
             $stmt = $connexio->prepare($query);
@@ -173,8 +173,8 @@ function obtenir_total_pagines($articlesPerPagina = 3) {
 }
 
 /* ----------------------------
-   User helper functions
-   ---------------------------- */
+    Funcions d'ajuda d'usuari
+    ---------------------------- */
 /**
  * get_user_by_username
  * Retorna un array amb les dades de l'usuari o false si no existeix
