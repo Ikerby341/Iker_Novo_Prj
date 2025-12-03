@@ -35,6 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $missatge = 'No tens permís per modificar aquest article';
                 } else {
                     $missatge = modificarDada($id, $camp, $dadaN);
+                    // Redirigir si la modificació va ser exitosa
+                    if (strpos($missatge, 'correctament') !== false || strpos($missatge, 'actualitzat') !== false) {
+                        if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+                        $_SESSION['flash'] = $missatge;
+                        header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
+                        exit;
+                    }
                 }
             } catch (PDOException $e) {
                 $missatge = 'Error a la base de dades: ' . $e->getMessage();
@@ -84,7 +91,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
                 <!-- Camp per especificar quin camp es vol modificar -->
                 <label for="camp">Nom del camp:</label><br>
-                <input type="text" name="camp" id="camp" required><br>
+                <select type="text" name="camp" id="camp" required>
+                    <option value="marca">Marca</option>
+                    <option value="model">Model</option>
+                </select>
+                <br>
                 <!-- Camp per la nova dada que s'inserirà -->
                 <label for="dadaN">Dada nova:</label><br>
                 <input type="text" name="dadaN" id="dadaN" required><br>

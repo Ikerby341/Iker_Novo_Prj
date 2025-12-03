@@ -152,6 +152,7 @@ button:hover {
   height: auto;
   border-radius: 5px;
   object-fit: cover;
+  padding: 10px;
 }
 
 /* Botón volver */
@@ -580,6 +581,9 @@ footer {
   width: 100%;
   height: 200px;
   overflow: hidden;
+  margin: 12px 12px 0 12px;
+  border-radius: 6px;
+  width: calc(100% - 24px);
 }
 
 .article-image img {
@@ -728,6 +732,25 @@ footer {
 }
 
 .form-container-adapted input[type="text"]:focus {
+  border-color: #0055a5;
+  box-shadow: 0 0 8px rgba(0, 85, 165, 0.5);
+  outline: none;
+}
+
+.form-container-adapted select {
+  font-size: 1.1rem;
+  padding: 12px 15px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 18px;
+  border-radius: 6px;
+  border: 1.5px solid #ccc;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background-color: white;
+  cursor: pointer;
+}
+
+.form-container-adapted select:focus {
   border-color: #0055a5;
   box-shadow: 0 0 8px rgba(0, 85, 165, 0.5);
   outline: none;
