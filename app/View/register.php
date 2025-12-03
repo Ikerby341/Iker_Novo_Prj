@@ -4,6 +4,7 @@
     $errors = [];
     $oldUser = '';
     $oldEmail = '';
+    $firstErrorField = null; // Per al focus JavaScript
     
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $username = $_POST['username'] ?? '';
@@ -17,6 +18,27 @@
             exit;
         } else {
             $errors = $result['errors'];
+            // Determinar quin camp té error per fer focus
+            if (!empty($errors)) {
+                foreach ($errors as $err) {
+                    if (stripos($err, 'usuari') !== false) {
+                        $firstErrorField = 'username';
+                        break;
+                    } elseif (stripos($err, 'email') !== false) {
+                        $firstErrorField = 'email';
+                        break;
+                    } elseif (stripos($err, 'contrasenya') !== false || stripos($err, 'password') !== false) {
+                        $firstErrorField = 'password';
+                        break;
+                    } elseif (stripos($err, 'confirma') !== false) {
+                        $firstErrorField = 'passwordC';
+                        break;
+                    } elseif (stripos($err, 'reCAPTCHA') !== false) {
+                        $firstErrorField = 'recaptcha';
+                        break;
+                    }
+                }
+            }
             $oldUser = $username;
             $oldEmail = $email;
         }
@@ -99,4 +121,19 @@
         </div>
     </footer>
 </body>
+<script>
+    // Auto-focus i select en el camp amb error
+    (function(){
+        var errorField = '<?php echo $firstErrorField; ?>';
+        if (errorField && errorField !== 'null') {
+            var field = document.getElementById(errorField);
+            if (field) {
+                field.focus();
+                if (field.type === 'text' || field.type === 'password' || field.type === 'email') {
+                    field.select();
+                }
+            }
+        }
+    })();
+</script>
 </html>

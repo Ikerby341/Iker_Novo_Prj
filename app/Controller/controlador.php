@@ -96,6 +96,13 @@ if (isset($_SESSION['user_id'])) {
     $_SESSION['last_activity'] = time();
 }
 
+// Processem petició de tancament de sessió si s'indica a la query string
+if (isset($_GET['logout']) && ($_GET['logout'] === '1' || $_GET['logout'] === 1)) {
+    // cridem a la funció que neteja la sessió i redirigeix
+    logout_user((defined('BASE_URL') ? BASE_URL : '/'));
+    exit;
+}
+
 /**
  * Llegeix la pàgina actual de la query string. Si no existeix o és invàlida, retorna 1.
  * Assegura que el valor retornat sigui un integer >= 1.
@@ -124,7 +131,7 @@ function obtenir_pagina_actual() {
  * mostrar_articles
  * Mostra els articles per la pagina i per-pagina indicats.
  */
-function mostrar_articles($articlesPerPagina = 3) {
+function mostrar_articles($articlesPerPagina = 8) {
     $page = obtenir_pagina_actual();
     $perPage = obtenir_per_pagina($articlesPerPagina);
     // Llegim opcions d'ordenació de la query string i validem-les
@@ -146,16 +153,21 @@ function mostrar_articles($articlesPerPagina = 3) {
     $articles = generar_articles($page, $perPage, $sort, $dir);
     
     if (is_array($articles)) {
-        $sortida = '';
+        $sortida = '<div class="articles-grid">';
         foreach ($articles as $fila) {
             $id = isset($fila['ID']) ? (int)$fila['ID'] : 0;
             $marca = isset($fila['marca']) ? htmlspecialchars($fila['marca']) : '';
             $model = isset($fila['model']) ? htmlspecialchars($fila['model']) : '';
-            $sortida .= '<section class="article-row">';
-            $sortida .= '<div class="article-content">';
-            $sortida .= "<h3>$marca</h3><p>$model</p>";
+            $ruta_img = (defined('BASE_URL') ? BASE_URL : '/') . htmlspecialchars($fila['ruta_img']);
+            $sortida .= '<div class="article-card">';
+            $sortida .= '<div class="article-image">';
+            $sortida .= '<img src="' . $ruta_img . '" alt="' . $marca . ' ' . $model . '" />';
             $sortida .= '</div>';
-            // Si estem logats, mostrem els botons (perquè tots els articles són nostres)
+            $sortida .= '<div class="article-content">';
+            $sortida .= "<h3>$marca</h3>";
+            $sortida .= "<p>$model</p>";
+            $sortida .= '</div>';
+            // Si estem logats, mostrem els botons
             if (is_logged_in()) {
                 $sortida .= '<div class="article-actions">';
                 $sortida .= '<form method="post" action="app/View/update.php">';
@@ -168,8 +180,9 @@ function mostrar_articles($articlesPerPagina = 3) {
                 $sortida .= '</form>';
                 $sortida .= '</div>';
             }
-            $sortida .= '</section>';
+            $sortida .= '</div>';
         }
+        $sortida .= '</div>';
         return $sortida;
     }
     return $articles;
@@ -179,7 +192,7 @@ function mostrar_articles($articlesPerPagina = 3) {
  * mostrar_paginacio
  * Retorna l'HTML de la paginacio per la pagina actual i per-pagina.
  */
-function mostrar_paginacio($articlesPerPagina = 3) {
+function mostrar_paginacio($articlesPerPagina = 8) {
     $page = obtenir_pagina_actual();
     $perPage = obtenir_per_pagina($articlesPerPagina);
     // Incorporem la mateixa lògica d'ordenació per mantenir els paràmetres en la paginació
@@ -207,7 +220,7 @@ function mostrar_paginacio($articlesPerPagina = 3) {
  * Llegeix l'opcio 'per_page' de la query string i la valida.
  * Retorna el valor valid (int) o el valor per defecte.
  */
-function obtenir_per_pagina($default = 3) {
+function obtenir_per_pagina($default = 8) {
     if (isset($_GET['per_page'])) {
         $raw = trim($_GET['per_page']);
         if (is_numeric($raw)) {
