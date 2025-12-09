@@ -11,8 +11,8 @@
      * @param string $model - El model del nou article
      * @return mixed - Retorna el resultat de l'operació d'inserció
      */
-    function inserirDada($marca, $model) {
-        return inserir($marca, $model);
+    function inserirDada($marca, $model, $ruta_img = null) {
+        return inserir($marca, $model, $ruta_img);
     }
 
     /**

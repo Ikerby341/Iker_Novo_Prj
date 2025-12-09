@@ -240,19 +240,29 @@ function clear_remember_token($userId) {
  * @param string $model - Model del cotxe
  * @return string - Missatge de confirmació o error
  */
-function inserir($marca,$model) {
+function inserir($marca,$model, $ruta_img = null) {
     global $connexio;
 
     try {
         // Preparar i executar la inserció amb paràmetres
-        $query = "INSERT INTO coches (marca, model, owner_id) VALUES (:marca, :model, :owner_id)";
-        $stmt = $connexio->prepare($query);
-        $stmt->bindValue(':marca', $marca, PDO::PARAM_STR);
-        $stmt->bindValue(':model', $model, PDO::PARAM_STR);
-        $stmt->bindValue(':owner_id', $_SESSION['user_id'], PDO::PARAM_INT);
-        $stmt->execute();
+        if ($ruta_img !== null && $ruta_img !== '') {
+            $query = "INSERT INTO coches (marca, model, owner_id, ruta_img) VALUES (:marca, :model, :owner_id, :ruta_img)";
+            $stmt = $connexio->prepare($query);
+            $stmt->bindValue(':marca', $marca, PDO::PARAM_STR);
+            $stmt->bindValue(':model', $model, PDO::PARAM_STR);
+            $stmt->bindValue(':owner_id', $_SESSION['user_id'], PDO::PARAM_INT);
+            $stmt->bindValue(':ruta_img', $ruta_img, PDO::PARAM_STR);
+            $stmt->execute();
+        } else {
+            $query = "INSERT INTO coches (marca, model, owner_id) VALUES (:marca, :model, :owner_id)";
+            $stmt = $connexio->prepare($query);
+            $stmt->bindValue(':marca', $marca, PDO::PARAM_STR);
+            $stmt->bindValue(':model', $model, PDO::PARAM_STR);
+            $stmt->bindValue(':owner_id', $_SESSION['user_id'], PDO::PARAM_INT);
+            $stmt->execute();
+        }
 
-            return "Article creat correctament!";
+        return "Article creat correctament!";
     } catch (PDOException $e) {
         return "Error en la creació: " . $e->getMessage();
     }

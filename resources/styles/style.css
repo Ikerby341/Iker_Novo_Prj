@@ -788,3 +788,13 @@ footer {
 .button-row .principalBox:hover {
   background-color: #5CB0FF;
 }
+
+.imageinput {  
+  font-size: 1.1rem;
+  padding: 12px 15px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 18px;
+  border-radius: 6px;
+  border: 1.5px solid #ccc;
+}

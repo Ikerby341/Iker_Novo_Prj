@@ -10,8 +10,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Obtenim les dades del formulari
     $titol = $_POST['titol'] ?? '';
     $cos = $_POST['cos'] ?? '';
+
+    // Processar la imatge si s'ha pujat
+    $ruta_db = null; // per defecte no passem ruta i deixem la BD aplicar el default
+    if (isset($_FILES['imagen']) && isset($_FILES['imagen']['tmp_name']) && is_uploaded_file($_FILES['imagen']['tmp_name'])) {
+        $file = $_FILES['imagen'];
+        if ($file['error'] === UPLOAD_ERR_OK) {
+            $allowed = ['image/jpeg' => '.jpg', 'image/png' => '.png', 'image/gif' => '.gif', 'image/webp' => '.webp'];
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $file['tmp_name']);
+            finfo_close($finfo);
+            if (array_key_exists($mime, $allowed)) {
+                $ext = $allowed[$mime];
+                // Generar nom segur per a la imatge
+                $safeName = preg_replace('/[^a-zA-Z0-9_-]/', '_', pathinfo($file['name'], PATHINFO_FILENAME));
+                $unique = $safeName . '_' . time() . bin2hex(random_bytes(4)) . $ext;
+                // Destí: carpeta public/assets/img
+                $destDir = realpath(__DIR__ . '/../../public/assets/img');
+                if ($destDir === false) {
+                    // crear carpeta si no existeix
+                    $destDir = __DIR__ . '/../../public/assets/img';
+                    if (!is_dir($destDir)) mkdir($destDir, 0755, true);
+                    $destDir = realpath($destDir);
+                }
+                $destPath = $destDir . DIRECTORY_SEPARATOR . $unique;
+                if (move_uploaded_file($file['tmp_name'], $destPath)) {
+                    // Guardem la ruta tal com vols: començar per public/
+                    $ruta_db = 'public/assets/img/' . $unique;
+                }
+            }
+        }
+    }
+
     // Cridem a la funció per inserir les dades i guardem el resultat
-    $missatge = inserirDada($titol, $cos);
+    $missatge = inserirDada($titol, $cos, $ruta_db);
 }
 ?>
 
@@ -39,7 +71,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-info"><span class="info-icon">ℹ️</span><span class="info-text"><?php echo htmlspecialchars($missatge); ?></span></div>
         <?php endif; ?>
         <!-- Formulari per inserir noves dades -->
-        <form method="POST" action="">
+        <form method="POST" action="" enctype="multipart/form-data">
+            <!-- Camp per pujar imatge -->
+            <label for="imagen">Imatge (opcional):</label><br>
+            <div class="imageinput">
+                <input type="file" name="imagen" id="imagen" accept="image/*">
+            </div>
             <!-- Camp pel títol -->
             <label for="titol">Marca:</label><br>
             <input type="text" name="titol" id="titol" required><br>
