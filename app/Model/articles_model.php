@@ -180,12 +180,31 @@ function modificar($id,$camp,$dadaN) {
 }
 
 /**
- * Esborra un article de la base de dades
+ * Esborra un article de la base de dades i la seva imatge associada
  */
 function esborrar($id) {
     global $connexio;
 
     try {
+        // Obtenir la ruta de la imatge
+        $stmt2 = $connexio->prepare("SELECT ruta_img FROM coches WHERE ID = ?");
+        $stmt2->execute([$id]);
+        $result = $stmt2->fetch(PDO::FETCH_ASSOC);
+        
+        // Eliminar la imatge del servidor si existeix i no és la imatge per defecte
+        if ($result && $result['ruta_img']) {
+            $ruta_img = $result['ruta_img'];
+            // No eliminar si és la imatge per defecte
+            $defaultImage = ['public/assets/img/default.webp'];
+            if (!in_array($ruta_img, $defaultImage, true)) {
+                $imagePath = __DIR__ . '/../../' . $ruta_img;
+                if (file_exists($imagePath) && is_file($imagePath)) {
+                    @unlink($imagePath);
+                }
+            }
+        }
+        
+        // Eliminar el registre de la base de dades
         $stmt = $connexio->prepare("DELETE FROM coches WHERE ID = ?");
         $stmt->execute([$id]);
 
