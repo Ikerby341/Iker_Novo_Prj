@@ -1,10 +1,10 @@
-<?php 
+<?php
 require_once __DIR__ . '/../../config/db-connection.php';
 
 /**
  * genera_articles
  * Genera els articles segons la pagina actual i articles per pagina.
- * Retorna un string HTML amb els articles.
+ * Retorna un array amb els articles.
  * paràmetres: $page (int), $articlesPerPagina (int)
  */
 function generar_articles($page = 1, $articlesPerPagina = 3, $sort = 'ID', $dir = 'ASC') {
@@ -37,25 +37,23 @@ function generar_articles($page = 1, $articlesPerPagina = 3, $sort = 'ID', $dir 
         $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (count($articles) === 0) {
-            return "<p> No hi ha articles disponibles. </p>";
+            return [];
         }
 
         return $articles;
 
     } catch (PDOException $e) {
-        return "<h1> Error en la consulta: " . htmlspecialchars($e->getMessage()) . "</h1>";
+        return [];
     }
 }
 
 /**
  * generar_paginacio
  * Genera els enllaços de paginacio (Anterior / Numeros / Seguent)
- * params: $currentPage (int), $articlesPerPagina (int)
  */
 function generar_paginacio($currentPage = 1, $articlesPerPagina = 3, $sort = 'ID', $dir = 'ASC') {
     global $connexio;
     try {
-        // Generar SELECT condicionat a l'inici de sessió de l'usuari
         if (is_logged_in()) {
             $query = "SELECT COUNT(*) AS total FROM coches WHERE owner_id = :owner_id";
             $stmt = $connexio->prepare($query);
@@ -75,23 +73,19 @@ function generar_paginacio($currentPage = 1, $articlesPerPagina = 3, $sort = 'ID
             return '';
         }
 
-        // Clamp de la pagina actual perquè no sobrepassi els límits
         $currentPage = max(1, min((int)$currentPage, $totalPagines));
 
         $sortida = '<div class="paginacio">';
 
-        // Parametre per mantenir articles per pagina i ordenació en els enllaços
         $perParam = '&per_page=' . urlencode((int)$articlesPerPagina);
         $sortParam = '&sort=' . urlencode($sort);
         $dirParam = '&dir=' . urlencode($dir);
 
-        // Botó Anterior (només si hi ha pagina anterior)
         if ($currentPage > 1) {
             $prevPage = $currentPage - 1;
             $sortida .= '<a class="btn prev" href="index.php?page=' . $prevPage . $perParam . $sortParam . $dirParam . '" rel="prev"><button type="button">◀</button></a> ';
         }
 
-        // Números de pagina
         for ($i = 1; $i <= $totalPagines; $i++) {
             if ($i == $currentPage) {
                 $sortida .= '<span class="page-number active">' . $i . '</span> ';
@@ -100,7 +94,6 @@ function generar_paginacio($currentPage = 1, $articlesPerPagina = 3, $sort = 'ID
             }
         }
 
-        // Botó Següent (només si hi ha pagina següent)
         if ($currentPage < $totalPagines) {
             $nextPage = $currentPage + 1;
             $sortida .= '<a class="btn next" href="index.php?page=' . $nextPage . $perParam . $sortParam . $dirParam . '" rel="next"><button type="button">▶</button></a>';
@@ -110,20 +103,17 @@ function generar_paginacio($currentPage = 1, $articlesPerPagina = 3, $sort = 'ID
 
         return $sortida;
     } catch (PDOException $e) {
-        return "<h1> Error en la consulta: " . $e->getMessage() . "</h1>";
+        return "";
     }
 }
 
 /**
  * obtenir_total_pagines
- * Retorna el nombre total de pagines per a un determinat articlesPerPagina
- * params: $articlesPerPagina (int)
  */
 function obtenir_total_pagines($articlesPerPagina = 3) {
     global $connexio;
 
     try {
-        // Generar SELECT condicionat a l'inici de sessió de l'usuari
         if (is_logged_in()) {
             $query = "SELECT COUNT(*) AS total FROM coches WHERE owner_id = :owner_id";
             $stmt = $connexio->prepare($query);
@@ -139,112 +129,17 @@ function obtenir_total_pagines($articlesPerPagina = 3) {
         if ($articlesPerPagina <= 0) return 1;
         return ($totalArticles > 0) ? (int)ceil($totalArticles / $articlesPerPagina) : 1;
     } catch (PDOException $e) {
-        // En cas d'error, assumim 1 pàgina per evitar fallades a la vista
         return 1;
     }
 }
 
-/* ----------------------------
-    Funcions d'ajuda d'usuari
-    ---------------------------- */
-/**
- * get_user_by_username
- * Retorna un array amb les dades de l'usuari o false si no existeix
- */
-function get_user_by_username($username) {
-    global $connexio;
-    try {
-        $stmt = $connexio->prepare('SELECT * FROM usuarios WHERE username = :u LIMIT 1');
-        $stmt->execute([':u' => $username]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user ? $user : false;
-    } catch (PDOException $e) {
-        return false;
-    }
-}
-
-/**
- * user_exists_by_username
- * Retorna true si existeix l'usuari amb aquest username
- */
-function user_exists_by_username($username) {
-    return (bool)get_user_by_username($username);
-}
-
-/**
- * create_user
- * Inserta un nou usuari, la contrasenya s'ha d'enviar ja hashejada
- * Retorna true si s'ha creat, o false en cas de error
- */
-function create_user($username, $email, $passwordHash) {
-    global $connexio;
-    try {
-        $stmt = $connexio->prepare('INSERT INTO usuarios (username, email, password) VALUES (:u, :e, :p)');
-        return $stmt->execute([
-            ':u' => $username,
-            ':e' => $email,
-            ':p' => $passwordHash
-        ]);
-    } catch (PDOException $e) {
-        return false;
-    }
-}
-
-/**
- * update_user_password_hash
- * Actualitza la contrasenya hash d'un usuari (per migracions quan la BD tenia contrasenya en text pla)
- */
-function update_user_password_hash($userId, $newHash) {
-    global $connexio;
-    try {
-        $stmt = $connexio->prepare('UPDATE usuarios SET password = :p WHERE id = :id');
-        return $stmt->execute([':p' => $newHash, ':id' => $userId]);
-    } catch (PDOException $e) {
-        return false;
-    }
-}
-
-/**
- * Remember-me token helpers
- */
-function set_remember_token($userId, $token) {
-    global $connexio;
-    try {
-        $stmt = $connexio->prepare('UPDATE usuarios SET remember_token = :t WHERE id = :id');
-        return $stmt->execute([':t' => $token, ':id' => $userId]);
-    } catch (PDOException $e) {
-        return false;
-    }
-}
-
-function find_user_by_remember_token($token) {
-    global $connexio;
-    try {
-        $stmt = $connexio->prepare('SELECT * FROM usuarios WHERE remember_token = :t LIMIT 1');
-        $stmt->execute([':t' => $token]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user ? $user : false;
-    } catch (PDOException $e) {
-        return false;
-    }
-}
-
-function clear_remember_token($userId) {
-    return set_remember_token($userId, null);
-}
-
 /**
  * Insereix un nou article a la base de dades
- * 
- * @param string $marca - Marca del cotxe
- * @param string $model - Model del cotxe
- * @return string - Missatge de confirmació o error
  */
 function inserir($marca,$model, $ruta_img = null) {
     global $connexio;
 
     try {
-        // Preparar i executar la inserció amb paràmetres
         if ($ruta_img !== null && $ruta_img !== '') {
             $query = "INSERT INTO coches (marca, model, owner_id, ruta_img) VALUES (:marca, :model, :owner_id, :ruta_img)";
             $stmt = $connexio->prepare($query);
@@ -270,22 +165,15 @@ function inserir($marca,$model, $ruta_img = null) {
 
 /**
  * Modifica un article existent a la base de dades
- * 
- * @param int $id - ID de l'article a modificar
- * @param string $camp - Nom del camp a modificar (titol o cos)
- * @param string $dadaN - Nova dada a inserir
- * @return string - Missatge de confirmació o error
  */
 function modificar($id,$camp,$dadaN) {
     global $connexio;
 
-        try {
-            // Preparar i executar l'actualització amb paràmetres (columna ID en majúscules)
-            $stmt = $connexio->prepare("UPDATE coches SET $camp = ? WHERE ID = ?");
-            $stmt->execute([$dadaN,$id]);
+    try {
+        $stmt = $connexio->prepare("UPDATE coches SET $camp = ? WHERE ID = ?");
+        $stmt->execute([$dadaN,$id]);
 
-        return "Artícle actualitzat correctament!";
-            return "Article actualitzat correctament!";
+        return "Article actualitzat correctament!";
     } catch (PDOException $e) {
         return "Error en la actualització: " . $e->getMessage();
     }
@@ -293,28 +181,22 @@ function modificar($id,$camp,$dadaN) {
 
 /**
  * Esborra un article de la base de dades
- * 
- * @param int $id - ID de l'article a esborrar
- * @return string - Missatge de confirmació o error
  */
 function esborrar($id) {
     global $connexio;
 
-        try {
-            // Preparar i executar l'eliminació amb paràmetres (columna ID en majúscules)
-            $stmt = $connexio->prepare("DELETE FROM coches WHERE ID = ?");
-            $stmt->execute([$id]);
+    try {
+        $stmt = $connexio->prepare("DELETE FROM coches WHERE ID = ?");
+        $stmt->execute([$id]);
 
-        // Comprovar si s'ha esborrat algun registre
         if ($stmt->rowCount() > 0) {
-              return "Article esborrat correctament!";
+            return "Article esborrat correctament!";
         } else {
-              return "No s'ha trobat l'article amb la ID especificada.";
+            return "No s'ha trobat l'article amb la ID especificada.";
         }
     } catch (PDOException $e) {
         return "Error en la eliminació: " . $e->getMessage();
     }
 }
-
 
 ?>

@@ -1,7 +1,7 @@
 <?php
 // Incloem el controlador que inicia la sessió i el model
 include_once __DIR__ . '/../Controller/controlador.php';
-include_once __DIR__ . '/../Controller/CRUDcontroller.php';
+include_once __DIR__ . '/../Controller/crud_controller.php';
 
 // Protegim l'accés: aquesta pàgina només es pot accedir via POST per esborrar
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

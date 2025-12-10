@@ -32,8 +32,13 @@ Funcionalitats principals
 Estructura de fitxers rellevant
 -------------------------------
 - `index.php` (entrada pública / vista principal)
-- `app/Controller/controlador.php` — gestió de sessions, autenticació, validacions i helpers (inclou `verify_recaptcha()` i flux de "remember me").
-- `app/Model/modelo.php` — funcions d'accés a la base de dades (articles, usuaris, token remember).
+- `app/Controller/controlador.php` — archivo principal que orquesta l'inclusió de tots els controllers específics.
+- `app/Controller/captcha_controller.php` — verificació de Google reCAPTCHA v2 (server-side).
+- `app/Controller/session_controller.php` — gestió de sessions, timeout i restauració amb remember-me.
+- `app/Controller/auth_controller.php` — autenticació, registre i validació de contrasenyes.
+- `app/Controller/pagination_controller.php` — paginació, ordenació i paràmetres de visualització.
+- `app/Controller/articles_controller.php` — visualització i manipulació d'articles.
+- `app/Model/users_model.php` i `app/Model/articles_model.php` — funcions d'accés a la base de dades separades per usuaris i articles (token remember a users_model).
 - `app/View/` — vistes PHP: `vista.php`, `login.php`, `register.php`, `create.php`, `update.php`, `delete.php`, etc.
 - `config/recaptcha.php` — defineix `RECAPTCHA_SECRET`.
 - `resources/styles/style.css` — estils principals del projecte.

@@ -2,8 +2,8 @@
     // Incluïm el controlador principal que inicia la sessió
     include_once __DIR__ .'/controlador.php';
     
-    // Incluïm el model que conté la lògica de negoci i accés a dades
-    include_once __DIR__ .'/../Model/modelo.php';
+    // Incluïm el model d'articles que conté la lògica de negoci i accés a dades
+    include_once __DIR__ .'/../Model/articles_model.php';
 
     /**
      * Funció per inserir una nova dada

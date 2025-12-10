@@ -1,6 +1,6 @@
 <?php
-// Incluïm el controlador que conté les funcions d'inserció
-include_once __DIR__ . '/../Controller/CRUDcontroller.php';
+// Incloure el controlador que conté les funcions de creació
+include_once __DIR__ . '/../Controller/crud_controller.php';
 
 // Inicialitzem la variable que contindrà el missatge de resposta
 $missatge = '';

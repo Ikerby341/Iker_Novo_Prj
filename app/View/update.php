@@ -1,6 +1,6 @@
 <?php
 // Incluïm el controlador que conté les funcions de modificació
-include_once __DIR__ . '/../Controller/CRUDcontroller.php';
+include_once __DIR__ . '/../Controller/crud_controller.php';
 
 // Inicialitzem la variable que contindrà el missatge de resposta
 $missatge = '';
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         // Si s'ha actualitzat amb èxit, esborrar la imatge anterior si no és la default
                                         if (strpos($missatge, 'correctament') !== false || strpos($missatge, 'actualitzat') !== false) {
                                             $prevRuta = $row['ruta_img'] ?? null;
-                                            $default = 'public/assets/img/default.png';
+                                            $default = 'public/assets/img/default.webp';
                                             if (!empty($prevRuta) && $prevRuta !== $default) {
                                                 $prevPath = realpath(__DIR__ . '/../../' . $prevRuta);
                                                 if ($prevPath && file_exists($prevPath)) {
