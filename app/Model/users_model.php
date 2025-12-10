@@ -90,4 +90,28 @@ function clear_remember_token($userId) {
     return set_remember_token($userId, null);
 }
 
+function modificarUsernameInDB($id, $newUsername) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('UPDATE usuarios SET username = :username WHERE id = :id');
+        return $stmt->execute([':username' => $newUsername, ':id' => $id]);
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * modificarEmailInDB
+ * Actualitza l'email d'un usuari. Pot ser repetit en la BD.
+ */
+function modificarEmailInDB($id, $newEmail) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('UPDATE usuarios SET email = :email WHERE id = :id');
+        return $stmt->execute([':email' => $newEmail, ':id' => $id]);
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
 ?>

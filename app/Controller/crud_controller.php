@@ -34,4 +34,15 @@
     function esborrarDada($id) {
         return esborrar($id);
     }
+
+    function modificarUsername($id, $newUsername) {
+        return modificarUsernameInDB($id, $newUsername);
+    }
+    
+    /**
+     * Modifica l'email d'un usuari
+     */
+    function modificarEmail($id, $newEmail) {
+        return modificarEmailInDB($id, $newEmail);
+    }
 ?>
