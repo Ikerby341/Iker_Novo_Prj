@@ -84,6 +84,8 @@ function register_user($username, $email, $password, $password_confirm) {
  * En cas d'èxit, inicia sessió i posa $_SESSION['user_id'] i $_SESSION['username']
  */
 function login_user($username, $password, $remember = false) {
+    if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+
     $username = trim($username);
     $errors = [];
 
@@ -92,17 +94,27 @@ function login_user($username, $password, $remember = false) {
 
     if (!empty($errors)) return ['success' => false, 'errors' => $errors];
 
-    $user = get_user_by_username($username);
-    if (!$user) return ['success' => false, 'errors' => ['Aquest usuari no existeix.']];
+    // Número d'intents fallits (per sessió)
+    $attempts = isset($_SESSION['login_attempts']) ? (int)$_SESSION['login_attempts'] : 0;
 
-    // Verificar reCAPTCHA (si s'envia el token des del formulari)
-    $recToken = $_POST['g-recaptcha-response'] ?? null;
-    if (empty($recToken)) {
-        return ['success' => false, 'errors' => ['ReCAPTCHA requerit. Si us plau, marca la casella i torna-ho a provar.']];
+    // Si ja hi ha hagut 3 intents fallits o més, requerim reCAPTCHA abans de continuar
+    if ($attempts >= 3) {
+        $recToken = $_POST['g-recaptcha-response'] ?? null;
+        if (empty($recToken)) {
+            return ['success' => false, 'errors' => ['ReCAPTCHA requerit. Si us plau, marca la casella i torna-ho a provar.']];
+        }
+        if (!function_exists('verify_recaptcha') || !verify_recaptcha($recToken)) {
+            // Incrementar intents fallits
+            $_SESSION['login_attempts'] = $attempts + 1;
+            return ['success' => false, 'errors' => ['Verificació reCAPTCHA fallida. Si us plau, torna-ho a provar.']];
+        }
     }
-    // Verify server-side
-    if (!function_exists('verify_recaptcha') || !verify_recaptcha($recToken)) {
-        return ['success' => false, 'errors' => ['Verificació reCAPTCHA fallida. Si us plau, torna-ho a provar.']];
+
+    $user = get_user_by_username($username);
+    if (!$user) {
+        // Incrementar intents fallits
+        $_SESSION['login_attempts'] = $attempts + 1;
+        return ['success' => false, 'errors' => ['Aquest usuari no existeix.']];
     }
 
     // Verificar contrasenya
@@ -127,11 +139,15 @@ function login_user($username, $password, $remember = false) {
     }
 
     if (!$verified) {
+        // Incrementar intents fallits
+        $_SESSION['login_attempts'] = $attempts + 1;
         return ['success' => false, 'errors' => ['Contrasenya incorrecta, si us plau intenta-ho de nou.']];
     }
 
     // Iniciar sessió
     if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+    // Resetar intents fallits
+    $_SESSION['login_attempts'] = 0;
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['username'] = $user['username'];
     $_SESSION['created'] = time();

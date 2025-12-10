@@ -84,8 +84,13 @@
                     <label for="password">Contrasenya:</label>
                     <br>
                     <input class="nice-input" type="password" id="password" name="password" required><br><br>
-                    <div aria-label="captcha" class="g-recaptcha" data-sitekey="6LeULxksAAAAAOp7haCI_UB1FyVg2gG2QbhN71Cu"></div>
-                    <br>
+                    <?php if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+                          $attempts = isset($_SESSION['login_attempts']) ? (int)$_SESSION['login_attempts'] : 0;
+                    ?>
+                    <?php if ($attempts >= 3): ?>
+                        <div aria-label="captcha" class="g-recaptcha" data-sitekey="6LeULxksAAAAAOp7haCI_UB1FyVg2gG2QbhN71Cu"></div>
+                        <br>
+                    <?php endif; ?>
                     <button type="submit">Iniciar sessió</button>
                     
                     <label style="display:inline-flex; align-items:center; gap:6px;">
