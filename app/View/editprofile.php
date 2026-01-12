@@ -67,8 +67,8 @@
 </head>
 <body>
     <header>
-        <div class="header-inner">
-            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>" class="menu">🏠 Home</a>
+        <div class="header-container">
+            <h1 style="color: #ffffff;"><a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>">Guarcar</a></h1>
         </div>
     </header>
     <div class="site-content">
@@ -84,7 +84,7 @@
             <input type="email" name="pfemail" id="pfemail" value="<?php echo htmlspecialchars($currentEmail ?? ''); ?>"><br>
             <div class="button-row">
                 <!-- Botó per tornar a la pàgina principal -->
-                <button class="box" type="button" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>
+                <button class="principalBox" type="button" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>
                 <!-- Botó per enviar el formulari -->
                 <button class="principalBox" type="submit">Editar ✏️</button>
             </div>
@@ -94,7 +94,7 @@
     <footer class="site-footer">
         <div class="footer-inner">
             <div class="footer-text">Pàgina feta per Iker Novo Oliva</div>
-            <div class="footer-small">Gràcies per visitar · 2025</div>
+            <div class="footer-small">Gràcies per visitar · <script>document.write(new Date().getFullYear());</script></div>
         </div>
     </footer>
 </body>

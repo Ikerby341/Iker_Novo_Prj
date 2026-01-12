@@ -44,12 +44,25 @@ p {
 header {
   background: #14213d;
   color: white;
-  padding: 15px 20px;
+  padding: 15px 0;
   margin-bottom: 30px;
   width: 100%;
-  text-align: right;
-  align-items: end;
-  align-content: end;
+}
+
+.header-container {
+  max-width: 90%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.header-inner {
+  margin-left: auto;
+}
+
+header h1 {
+  margin: 0;
 }
 
 section {
@@ -765,7 +778,7 @@ footer {
 
 /* Optional: extra spacing for individual buttons */
 .button-row .box {
-  background-color: #888;
+  background-color: #14213d;
   padding: 8px 14px;
   border-radius: 6px;
   font-weight: 600;
@@ -773,7 +786,7 @@ footer {
 }
 
 .button-row .box:hover {
-  background-color: #555;
+  background-color: #0055a5;
 }
 
 .button-row .principalBox {

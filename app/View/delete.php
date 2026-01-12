@@ -92,7 +92,7 @@ if ($id <= 0) {
     <footer class="site-footer">
         <div class="footer-inner">
             <div class="footer-text">Pàgina feta per Iker Novo Oliva</div>
-            <div class="footer-small">Gràcies per visitar · 2025</div>
+            <div class="footer-small">Gràcies per visitar · <script>document.write(new Date().getFullYear());</script></div>
         </div>
     </footer>
 </body>

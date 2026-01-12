@@ -58,8 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <header>
-        <div class="header-inner">
-            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>" class="menu">🏠 Home</a>
+        <div class="header-container">
+            <h1 style="color: #ffffff;"><a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>">Guarcar</a></h1>
         </div>
     </header>
     <div class="site-content">
@@ -85,18 +85,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="text" name="cos" id="cos" required><br>
             <div class="button-row">
                 <!-- Botó per tornar a la pàgina principal -->
-                <button class="box" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>
+                <button class="principalBox" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>
                 <!-- Botó per enviar el formulari -->
                 <button class="principalBox" type="submit">Insertar ⛳</button>
             </div>
         </form>
     </section>
     </div>
-        <footer class="site-footer">
-            <div class="footer-inner">
-                <div class="footer-text">Pàgina feta per Iker Novo Oliva</div>
-                <div class="footer-small">Gràcies per visitar · 2025</div>
-            </div>
-        </footer>
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-text">Pàgina feta per Iker Novo Oliva</div>
+            <div class="footer-small">Gràcies per visitar · <script>document.write(new Date().getFullYear());</script></div>
+        </div>
+    </footer>
 </body>
 </html>

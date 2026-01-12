@@ -48,8 +48,8 @@
 </head>
 <body>
     <header>
-        <div class="header-inner">
-            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>" class="menu">🏠 Home</a>
+        <div class="header-container">
+            <h1 style="color: #ffffff;"><a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>">Guarcar</a></h1>
         </div>
     </header>
     <div class="site-content">
@@ -109,7 +109,7 @@
         <footer class="site-footer">
             <div class="footer-inner">
                 <div class="footer-text">Pàgina feta per Iker Novo Oliva</div>
-                <div class="footer-small">Gràcies per visitar · 2025</div>
+                <div class="footer-small">Gràcies per visitar · <script>document.write(new Date().getFullYear());</script></div>
             </div>
         </footer>
     </body>

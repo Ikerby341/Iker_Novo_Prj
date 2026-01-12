@@ -13,27 +13,35 @@
 </head>
 <body>
     <header>
-        <div class="header-inner">
-            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>" class="menu">🏠 Home</a>
-            <div class="header-right">
+        <div class="header-container">
+            <?php if (is_logged_in()): ?>
+                <h1 style="color: #ffffff; margin-right: 76%;"><a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>">Guarcar</a></h1>
+            <?php else: ?>
+                <h1 style="color: #ffffff; margin-right: 82%;"><a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>">Guarcar</a></h1>
+            <?php endif; ?>
+            <div class="header-inner">
                 <?php if (is_logged_in()): ?>
-                    <div class="signin" id="signin">
-                        <button id="signinBtn" class="signin-btn" aria-haspopup="true" aria-expanded="false">👤 <?php echo htmlspecialchars($_SESSION['username']); ?></button>
-                        <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
-                            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/create.php">Crear articles</a>
-                            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/editprofile.php">Editar perfil</a>
-                            <a href="?logout=1">Tancar sessió</a>
-                        </div>
-                    </div>
-                <?php else: ?>
-                    <div class="signin" id="signin">
-                        <button id="signinBtn" class="signin-btn" aria-haspopup="true" aria-expanded="false">🔐 Sign-in</button>
-                        <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
-                            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/login.php">Iniciar sessió</a>
-                            <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/register.php">Registrar-se</a>
-                        </div>
-                    </div>
+                    <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/create.php" class="menu">➕ Crear</a>
                 <?php endif; ?>
+                <div class="header-right">
+                    <?php if (is_logged_in()): ?>
+                        <div class="signin" id="signin">
+                            <button id="signinBtn" class="signin-btn" aria-haspopup="true" aria-expanded="false">👤 <?php echo htmlspecialchars($_SESSION['username']); ?></button>
+                            <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
+                                <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/editprofile.php">Editar perfil</a>
+                                <a href="?logout=1">Tancar sessió</a>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="signin" id="signin">
+                            <button id="signinBtn" class="signin-btn" aria-haspopup="true" aria-expanded="false">🔐 Sign-in</button>
+                            <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
+                                <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/login.php">Iniciar sessió</a>
+                                <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/register.php">Registrar-se</a>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </header>
@@ -144,7 +152,7 @@
     <footer class="site-footer">
         <div class="footer-inner">
             <div class="footer-text">Pàgina feta per Iker Novo Oliva</div>
-            <div class="footer-small">Gràcies per visitar · 2025</div>
+            <div class="footer-small">Gràcies per visitar · <script>document.write(new Date().getFullYear());</script></div>
         </div>
     </footer>
 </body>
