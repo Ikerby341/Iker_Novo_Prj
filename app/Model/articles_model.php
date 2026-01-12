@@ -69,41 +69,23 @@ function generar_paginacio($currentPage = 1, $articlesPerPagina = 3, $sort = 'ID
 
         $totalPagines = ($articlesPerPagina > 0) ? ceil($totalArticles / $articlesPerPagina) : 1;
 
-        if ($totalPagines <= 1) {
-            return '';
-        }
-
         $currentPage = max(1, min((int)$currentPage, $totalPagines));
 
-        $sortida = '<div class="paginacio">';
-
-        $perParam = '&per_page=' . urlencode((int)$articlesPerPagina);
-        $sortParam = '&sort=' . urlencode($sort);
-        $dirParam = '&dir=' . urlencode($dir);
-
-        if ($currentPage > 1) {
-            $prevPage = $currentPage - 1;
-            $sortida .= '<a class="btn prev" href="index.php?page=' . $prevPage . $perParam . $sortParam . $dirParam . '" rel="prev"><button type="button">◀</button></a> ';
-        }
-
-        for ($i = 1; $i <= $totalPagines; $i++) {
-            if ($i == $currentPage) {
-                $sortida .= '<span class="page-number active">' . $i . '</span> ';
-            } else {
-                $sortida .= '<a class="page-number" href="index.php?page=' . $i . $perParam . $sortParam . $dirParam . '">' . $i . '</a> ';
-            }
-        }
-
-        if ($currentPage < $totalPagines) {
-            $nextPage = $currentPage + 1;
-            $sortida .= '<a class="btn next" href="index.php?page=' . $nextPage . $perParam . $sortParam . $dirParam . '" rel="next"><button type="button">▶</button></a>';
-        }
-
-        $sortida .= '</div>';
-
-        return $sortida;
+        return [
+            'totalPages' => $totalPagines,
+            'currentPage' => $currentPage,
+            'perPage' => $articlesPerPagina,
+            'sort' => $sort,
+            'dir' => $dir
+        ];
     } catch (PDOException $e) {
-        return "";
+        return [
+            'totalPages' => 1,
+            'currentPage' => 1,
+            'perPage' => $articlesPerPagina,
+            'sort' => $sort,
+            'dir' => $dir
+        ];
     }
 }
 

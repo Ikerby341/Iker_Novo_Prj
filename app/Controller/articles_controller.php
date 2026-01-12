@@ -93,7 +93,39 @@ function mostrar_paginacio($articlesPerPagina = 8) {
         if (in_array($d, ['ASC','DESC'])) $dir = $d;
     }
 
-    return generar_paginacio($page, $perPage, $sort, $dir);
+    $paginacioData = generar_paginacio($page, $perPage, $sort, $dir);
+
+    if ($paginacioData['totalPages'] <= 1) {
+        return '';
+    }
+
+    $sortida = '<div class="paginacio">';
+
+    $perParam = '&per_page=' . urlencode((int)$paginacioData['perPage']);
+    $sortParam = '&sort=' . urlencode($paginacioData['sort']);
+    $dirParam = '&dir=' . urlencode($paginacioData['dir']);
+
+    if ($paginacioData['currentPage'] > 1) {
+        $prevPage = $paginacioData['currentPage'] - 1;
+        $sortida .= '<a class="btn prev" href="index.php?page=' . $prevPage . $perParam . $sortParam . $dirParam . '" rel="prev"><button type="button">◀</button></a> ';
+    }
+
+    for ($i = 1; $i <= $paginacioData['totalPages']; $i++) {
+        if ($i == $paginacioData['currentPage']) {
+            $sortida .= '<span class="page-number active">' . $i . '</span> ';
+        } else {
+            $sortida .= '<a class="page-number" href="index.php?page=' . $i . $perParam . $sortParam . $dirParam . '">' . $i . '</a> ';
+        }
+    }
+
+    if ($paginacioData['currentPage'] < $paginacioData['totalPages']) {
+        $nextPage = $paginacioData['currentPage'] + 1;
+        $sortida .= '<a class="btn next" href="index.php?page=' . $nextPage . $perParam . $sortParam . $dirParam . '" rel="next"><button type="button">▶</button></a>';
+    }
+
+    $sortida .= '</div>';
+
+    return $sortida;
 }
 
 ?>
