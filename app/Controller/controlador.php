@@ -25,6 +25,7 @@ include_once __DIR__ .'/session_controller.php';
 include_once __DIR__ .'/auth_controller.php';
 include_once __DIR__ .'/pagination_controller.php';
 include_once __DIR__ .'/articles_controller.php';
+include_once __DIR__ .'/users_controller.php';
 
 // Inicialitzar la sessió
 initialize_session();

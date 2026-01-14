@@ -126,4 +126,32 @@ function modificarEmailInDB($id, $newEmail) {
     }
 }
 
+/**
+ * delete_user
+ * Elimina un usuario por ID
+ */
+function delete_user($id) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('DELETE FROM usuarios WHERE id = :id');
+        return $stmt->execute([':id' => $id]);
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * update_user_admin
+ * Actualiza el estado admin de un usuario
+ */
+function update_user_admin($id, $is_admin) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('UPDATE usuarios SET admin = :admin WHERE id = :id');
+        return $stmt->execute([':admin' => $is_admin, ':id' => $id]);
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
 ?>
