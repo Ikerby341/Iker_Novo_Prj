@@ -40,6 +40,7 @@ function initialize_session() {
             if (session_status() !== PHP_SESSION_ACTIVE) session_start();
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
+            $_SESSION['admin'] = isset($user['admin']) ? $user['admin'] : false;
             $_SESSION['created'] = time();
             $_SESSION['last_activity'] = time();
 
@@ -69,6 +70,14 @@ function initialize_session() {
  */
 function is_logged_in() {
     return (isset($_SESSION['user_id']) && !empty($_SESSION['user_id']));
+}
+
+/**
+ * is_admin
+ * Retorna true si l'usuari logat és administrador
+ */
+function is_admin() {
+    return (isset($_SESSION['admin']) && (bool)$_SESSION['admin']);
 }
 
 /**

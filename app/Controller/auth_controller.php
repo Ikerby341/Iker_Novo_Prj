@@ -150,6 +150,7 @@ function login_user($username, $password, $remember = false) {
     $_SESSION['login_attempts'] = 0;
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['username'] = $user['username'];
+    $_SESSION['admin'] = isset($user['admin']) ? $user['admin'] : false;
     $_SESSION['created'] = time();
     $_SESSION['last_activity'] = time();
 

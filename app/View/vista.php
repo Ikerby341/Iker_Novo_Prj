@@ -15,9 +15,9 @@
     <header>
         <div class="header-container">
             <?php if (is_logged_in()): ?>
-                <h1 style="color: #ffffff; margin-right: 76%;"><a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>">Guarcar</a></h1>
+                <h1 style="color: #ffffff; margin-right: 74%;"><a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>">GUARCAR</a></h1>
             <?php else: ?>
-                <h1 style="color: #ffffff; margin-right: 82%;"><a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>">Guarcar</a></h1>
+                <h1 style="color: #ffffff; margin-right: 80%;"><a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>">GUARCAR</a></h1>
             <?php endif; ?>
             <div class="header-inner">
                 <?php if (is_logged_in()): ?>
@@ -28,6 +28,9 @@
                         <div class="signin" id="signin">
                             <button id="signinBtn" class="signin-btn" aria-haspopup="true" aria-expanded="false">👤 <?php echo htmlspecialchars($_SESSION['username']); ?></button>
                             <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
+                                <?php if (is_admin()): ?>
+                                    <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/admin.php">Gestionar usuaris</a>
+                                <?php endif; ?>
                                 <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/editprofile.php">Editar perfil</a>
                                 <a href="?logout=1">Tancar sessió</a>
                             </div>

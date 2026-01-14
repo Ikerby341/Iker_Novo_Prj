@@ -56,7 +56,7 @@
 <body>
     <header>
         <div class="header-container">
-            <h1 style="color: #ffffff;"><a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>">Guarcar</a></h1>
+            <h1 style="color: #ffffff;"><a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>">GUARCAR</a></h1>
         </div>
     </header>
     <div class="site-content">

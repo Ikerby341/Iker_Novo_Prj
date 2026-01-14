@@ -4,6 +4,18 @@ require_once __DIR__ . '/../../config/db-connection.php';
 /* ----------------------------
     Funcions d'ajuda d'usuari
    ---------------------------- */
+/** Retorna tots els usuaris */
+function get_all_users() {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('SELECT * FROM usuarios ORDER BY id ASC');
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
 /**
  * get_user_by_username
  * Retorna un array amb les dades de l'usuari o false si no existeix
