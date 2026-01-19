@@ -99,12 +99,12 @@
             <div class="controls-row">
                 <div class="controls-item">
                     <label for="orderby" class="controls-label">Ordenar per:</label>
-                    <select id="orderby" name="orderby" class="controls-select" onchange="if(this.value) location = this.value;">
-                        <option value="<?php echo $base; ?>"<?php echo ($curSort==='' ? ' selected' : ''); ?>>Per defecte</option>
-                        <option value="<?php echo $base . '&sort=marca&dir=ASC'; ?>"<?php echo ($curSort==='marca' && $curDir==='ASC' ? ' selected' : ''); ?>>Marca (Asc)</option>
-                        <option value="<?php echo $base . '&sort=marca&dir=DESC'; ?>"<?php echo ($curSort==='marca' && $curDir==='DESC' ? ' selected' : ''); ?>>Marca (Desc)</option>
-                        <option value="<?php echo $base . '&sort=model&dir=ASC'; ?>"<?php echo ($curSort==='model' && $curDir==='ASC' ? ' selected' : ''); ?>>Model (Asc)</option>
-                        <option value="<?php echo $base . '&sort=model&dir=DESC'; ?>"<?php echo ($curSort==='model' && $curDir==='DESC' ? ' selected' : ''); ?>>Model (Desc)</option>
+                    <select id="orderby" name="orderby" class="controls-select">
+                        <option value="?sort=ID&dir=ASC"<?php echo ($curSort==='' ? ' selected' : ''); ?>>Per defecte</option>
+                        <option value="?sort=marca&dir=ASC"<?php echo ($curSort==='marca' && $curDir==='ASC' ? ' selected' : ''); ?>>Marca (Asc)</option>
+                        <option value="?sort=marca&dir=DESC"<?php echo ($curSort==='marca' && $curDir==='DESC' ? ' selected' : ''); ?>>Marca (Desc)</option>
+                        <option value="?sort=model&dir=ASC"<?php echo ($curSort==='model' && $curDir==='ASC' ? ' selected' : ''); ?>>Model (Asc)</option>
+                        <option value="?sort=model&dir=DESC"<?php echo ($curSort==='model' && $curDir==='DESC' ? ' selected' : ''); ?>>Model (Desc)</option>
                     </select>
                 </div>
 
@@ -137,15 +137,20 @@
             const all = window.__ALL_ARTICLES__ || [];
             const isLogged = window.__IS_LOGGED_IN__ === true || window.__IS_LOGGED_IN__ === 'true';
             const input = document.getElementById('searchInput');
+            const orderby = document.getElementById('orderby');
             const perPage = parseInt(document.getElementById('currentPerPage').value, 10) || 8;
             const articlesContainer = document.getElementById('articlesContainer');
             const paginationContainer = document.querySelector('.fixed-pagination');
             let currentPage = 1;
             let debounceTimer;
+            let currentSort = 'ID';
+            let currentDir = 'ASC';
 
             function renderPage(items, page) {
+                const filtered = filterArticles(input.value || '');
+                const sorted = sortArticles(filtered, currentSort, currentDir);
                 const start = (page - 1) * perPage;
-                const pageItems = items.slice(start, start + perPage);
+                const pageItems = sorted.slice(start, start + perPage);
                 let html = '<div class="articles-grid">';
                 pageItems.forEach(fila => {
                     const marca = escapeHtml(fila.marca || '');
@@ -180,7 +185,9 @@
             }
 
             function renderPagination(totalItems, page) {
-                const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+                const filtered = filterArticles(input.value || '');
+                const sorted = sortArticles(filtered, currentSort, currentDir);
+                const totalPages = Math.max(1, Math.ceil(sorted.length / perPage));
                 currentPage = Math.max(1, Math.min(page, totalPages));
                 let html = '';
                 if (totalPages <= 1) {
@@ -204,8 +211,7 @@
                 paginationContainer.querySelectorAll('[data-page]').forEach(el => {
                     el.addEventListener('click', function(e){
                         const p = parseInt(this.getAttribute('data-page'), 10) || 1;
-                        const filtered = filterArticles(input.value || '');
-                        renderPage(filtered, p);
+                        renderPage(all, p);
                     });
                 });
             }
@@ -216,6 +222,24 @@
                 return all.filter(a => {
                     return String(a.marca || '').toLowerCase().includes(term) || String(a.model || '').toLowerCase().includes(term);
                 });
+            }
+
+            function sortArticles(items, field, direction) {
+                const sorted = items.slice();
+                const dir = direction === 'DESC' ? -1 : 1;
+                sorted.sort((a, b) => {
+                    let aVal = a[field] || '';
+                    let bVal = b[field] || '';
+                    // Si son números, comparar como números
+                    if (typeof aVal === 'number' && typeof bVal === 'number') {
+                        return (aVal - bVal) * dir;
+                    }
+                    // Si no, comparar como strings
+                    aVal = String(aVal).toLowerCase();
+                    bVal = String(bVal).toLowerCase();
+                    return aVal.localeCompare(bVal) * dir;
+                });
+                return sorted;
             }
 
             function escapeHtml(str) {
@@ -240,17 +264,27 @@
 
             input.addEventListener('change', function(){
                 // 'change' fires when input loses focus or Enter pressed — keep for fallback
-                const filtered = filterArticles(this.value);
-                renderPage(filtered, 1);
+                renderPage(all, 1);
             });
 
             input.addEventListener('keypress', function(e){
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    const filtered = filterArticles(this.value);
-                    renderPage(filtered, 1);
+                    renderPage(all, 1);
                 }
             });
+
+            // Event listener para el selector de ordenamiento
+            if (orderby) {
+                orderby.addEventListener('change', function(){
+                    const val = this.value;
+                    // Parse the URL to extract sort and dir
+                    const urlParams = new URLSearchParams(val.split('?')[1] || '');
+                    currentSort = urlParams.get('sort') || 'ID';
+                    currentDir = urlParams.get('dir') || 'ASC';
+                    renderPage(all, 1);
+                });
+            }
 
             // inicialitza amb tots
             renderPage(all, 1);
