@@ -68,7 +68,33 @@
                 $base = 'index.php?per_page=' . urlencode($per) . '&page=1';
                 $curSort = isset($_GET['sort']) ? $_GET['sort'] : '';
                 $curDir = isset($_GET['dir']) ? strtoupper($_GET['dir']) : '';
+                $curSearch = '';
             ?>
+
+            <div class="search-bar-container">
+                <input type="text" id="searchInput" class="search-bar" placeholder="Buscar marca o model..." value="<?php echo htmlspecialchars($curSearch); ?>" />
+                <input type="hidden" id="currentSort" value="<?php echo htmlspecialchars($curSort); ?>">
+                <input type="hidden" id="currentDir" value="<?php echo htmlspecialchars($curDir); ?>">
+                <input type="hidden" id="currentPerPage" value="<?php echo htmlspecialchars($per); ?>">
+            </div>
+
+            <?php
+                // Precarreguem totes les dades al client per fer cerca local (només del propietari si està logat)
+                $allRows = listar_tots_articles(null);
+                $jsRows = [];
+                foreach ($allRows as $r) {
+                    $jsRows[] = [
+                        'ID' => isset($r['ID']) ? (int)$r['ID'] : 0,
+                        'marca' => isset($r['marca']) ? $r['marca'] : '',
+                        'model' => isset($r['model']) ? $r['model'] : '',
+                        'ruta_img' => (defined('BASE_URL') ? BASE_URL : '/') . (isset($r['ruta_img']) ? $r['ruta_img'] : '')
+                    ];
+                }
+            ?>
+            <script>
+                window.__ALL_ARTICLES__ = <?php echo json_encode($jsRows, JSON_UNESCAPED_UNICODE); ?>;
+                window.__IS_LOGGED_IN__ = <?php echo is_logged_in() ? 'true' : 'false'; ?>;
+            </script>
 
             <div class="controls-row">
                 <div class="controls-item">
@@ -88,12 +114,14 @@
                     <input type="hidden" name="page" value="1">
                     <input type="hidden" name="sort" value="<?php echo htmlspecialchars($curSort); ?>">
                     <input type="hidden" name="dir" value="<?php echo htmlspecialchars($curDir); ?>">
+                    
                     <button type="submit" class="controls-button">Aplicar</button>
                 </form>
             </div>
 
         <?php
-            echo mostrar_articles();  
+            // Contenidor renderitzat i actualitzat al client (filtrat en JS)
+            echo '<div id="articlesContainer">' . mostrar_articles() . '</div>';
         ?>
     </div>
 
@@ -103,6 +131,131 @@
     </div>
     </div> <!-- .site-content -->
     
+    <script>
+        // Cerca completament al client: filtrem sobre window.__ALL_ARTICLES__
+        (function(){
+            const all = window.__ALL_ARTICLES__ || [];
+            const isLogged = window.__IS_LOGGED_IN__ === true || window.__IS_LOGGED_IN__ === 'true';
+            const input = document.getElementById('searchInput');
+            const perPage = parseInt(document.getElementById('currentPerPage').value, 10) || 8;
+            const articlesContainer = document.getElementById('articlesContainer');
+            const paginationContainer = document.querySelector('.fixed-pagination');
+            let currentPage = 1;
+            let debounceTimer;
+
+            function renderPage(items, page) {
+                const start = (page - 1) * perPage;
+                const pageItems = items.slice(start, start + perPage);
+                let html = '<div class="articles-grid">';
+                pageItems.forEach(fila => {
+                    const marca = escapeHtml(fila.marca || '');
+                    const model = escapeHtml(fila.model || '');
+                    const ruta_img = escapeHtml(fila.ruta_img || '');
+                    const id = fila.ID || 0;
+                    html += '<div class="article-card">';
+                    html += '<div class="article-image">';
+                    html += '<img src="' + ruta_img + '" alt="' + marca + ' ' + model + '" />';
+                    html += '</div>';
+                    html += '<div class="article-content">';
+                    html += '<h3>' + marca + '</h3>';
+                    html += '<p>' + model + '</p>';
+                    html += '</div>';
+                    if (isLogged) {
+                        html += '<div class="article-actions">';
+                        html += '<form method="post" action="app/View/update.php">';
+                        html += '<input type="hidden" name="id" value="' + id + '">';
+                        html += '<button type="submit" class="edit-btn" title="Editar">✏️</button>';
+                        html += '</form>';
+                        html += '<form method="post" action="app/View/delete.php">';
+                        html += '<input type="hidden" name="id" value="' + id + '">';
+                        html += '<button type="submit" class="delete-btn" title="Esborrar" onclick="return confirm(\'Est\'as segur que vols eliminar aquest article?\')">🗑️</button>';
+                        html += '</form>';
+                        html += '</div>';
+                    }
+                    html += '</div>';
+                });
+                html += '</div>';
+                if (articlesContainer) articlesContainer.innerHTML = html;
+                renderPagination(items.length, page);
+            }
+
+            function renderPagination(totalItems, page) {
+                const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+                currentPage = Math.max(1, Math.min(page, totalPages));
+                let html = '';
+                if (totalPages <= 1) {
+                    paginationContainer.innerHTML = '';
+                    return;
+                }
+                html += '<div class="paginacio">';
+                if (currentPage > 1) {
+                    html += '<a class="btn prev" data-page="' + (currentPage - 1) + '"><button type="button">◀</button></a> ';
+                }
+                for (let i = 1; i <= totalPages; i++) {
+                    if (i === currentPage) html += '<span class="page-number active">' + i + '</span> ';
+                    else html += '<a class="page-number" data-page="' + i + '">' + i + '</a> ';
+                }
+                if (currentPage < totalPages) {
+                    html += '<a class="btn next" data-page="' + (currentPage + 1) + '"><button type="button">▶</button></a>';
+                }
+                html += '</div>';
+                paginationContainer.innerHTML = html;
+                // bind
+                paginationContainer.querySelectorAll('[data-page]').forEach(el => {
+                    el.addEventListener('click', function(e){
+                        const p = parseInt(this.getAttribute('data-page'), 10) || 1;
+                        const filtered = filterArticles(input.value || '');
+                        renderPage(filtered, p);
+                    });
+                });
+            }
+
+            function filterArticles(term) {
+                term = (term || '').trim().toLowerCase();
+                if (term === '') return all.slice();
+                return all.filter(a => {
+                    return String(a.marca || '').toLowerCase().includes(term) || String(a.model || '').toLowerCase().includes(term);
+                });
+            }
+
+            function escapeHtml(str) {
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            // handlers
+            input.addEventListener('input', function(){
+                clearTimeout(debounceTimer);
+                const val = this.value;
+                debounceTimer = setTimeout(function(){
+                    const filtered = filterArticles(val);
+                    renderPage(filtered, 1);
+                    input.focus();
+                }, 250);
+            });
+
+            input.addEventListener('change', function(){
+                // 'change' fires when input loses focus or Enter pressed — keep for fallback
+                const filtered = filterArticles(this.value);
+                renderPage(filtered, 1);
+            });
+
+            input.addEventListener('keypress', function(e){
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const filtered = filterArticles(this.value);
+                    renderPage(filtered, 1);
+                }
+            });
+
+            // inicialitza amb tots
+            renderPage(all, 1);
+        })();
+    </script>
     <script>
         // Dropdown para Sign-in: abre/cierra y cierra al click fuera o ESC
         (function(){

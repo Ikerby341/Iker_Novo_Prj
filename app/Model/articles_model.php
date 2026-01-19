@@ -116,6 +116,35 @@ function obtenir_total_pagines($articlesPerPagina = 3) {
 }
 
 /**
+ * listar_tots_articles
+ * Retorna tots els articles (filtrats per usuari si cal). S'utilitza per carregar totes les dades al client.
+ */
+function listar_tots_articles($onlyOwner = null) {
+    global $connexio;
+
+    try {
+        if ($onlyOwner === null) {
+            $onlyOwner = is_logged_in();
+        }
+
+        if ($onlyOwner && is_logged_in()) {
+            $query = "SELECT ID, marca, model, ruta_img FROM coches WHERE owner_id = :owner_id ORDER BY ID ASC";
+            $stmt = $connexio->prepare($query);
+            $stmt->bindValue(':owner_id', $_SESSION['user_id'], PDO::PARAM_INT);
+            $stmt->execute();
+        } else {
+            $query = "SELECT ID, marca, model, ruta_img FROM coches ORDER BY ID ASC";
+            $stmt = $connexio->query($query);
+        }
+
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $rows ?: [];
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+/**
  * Insereix un nou article a la base de dades
  */
 function inserir($marca,$model, $ruta_img = null) {

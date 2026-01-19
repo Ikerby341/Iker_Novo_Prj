@@ -532,6 +532,35 @@ footer {
   text-align: center;
 }
 
+/* Search bar container: centered search */
+.search-bar-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.search-bar {
+  width: 400px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 2px solid #0055a5;
+  background: #ffffff;
+  color: #14213d;
+  font-size: 16px;
+  font-weight: 500;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: #5CB0FF;
+  box-shadow: 0 0 8px rgba(0, 85, 165, 0.3);
+}
+
+.search-bar::placeholder {
+  color: #999;
+}
+
 /* Controls row: ordenar + per-page en la mateixa línia i amb mateix format */
 .controls-row {
   display: flex;
