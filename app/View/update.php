@@ -1,8 +1,10 @@
 <?php
 // Incluïm el controlador que conté les funcions de modificació
+include_once __DIR__ . '/../../config/app.php';
+include_once __DIR__ . '/../Controller/controlador.php';
 include_once __DIR__ . '/../Controller/crud_controller.php';
 
-// Inicialitzem la variable que contindrà el missatge de resposta
+// Inicialitzem les variables
 $missatge = '';
 $id = null;
 
@@ -16,98 +18,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int)($_POST['id'] ?? 0);
         $camp = $_POST['camp'] ?? '';
         $dadaN = $_POST['dadaN'] ?? '';
+        $image_file = $_FILES['imagen_update'] ?? null;
 
-        // Validacions bàsiques
-        if ($id <= 0) {
-            $missatge = 'ID invàlida';
-        } elseif (trim($camp) === '') {
-            $missatge = 'Camp no pot estar buit';
-        } elseif ($camp !== 'ruta_img' && trim($dadaN) === '') {
-            // Quan s'actualitza la imatge no cal que dadaN estigui omplert
-            $missatge = 'Dada nova no pot estar buida';
-        } else {
-            // Verificar propietat abans de modificar
-                try {
-                global $connexio;
-                $stmt = $connexio->prepare('SELECT owner_id, ruta_img FROM coches WHERE ID = ? LIMIT 1');
-                $stmt->execute([$id]);
-                $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                if (!$row) {
-                    $missatge = 'Article no trobat';
-                } elseif ((int)$row['owner_id'] !== (int)($_SESSION['user_id'] ?? 0)) {
-                    $missatge = 'No tens permís per modificar aquest article';
-                } else {
-                    // Si s'està actualitzant la imatge
-                    if ($camp === 'ruta_img') {
-                        // Verifiquem que s'ha pujat un fitxer
-                        if (!isset($_FILES['imagen_update']) || !is_uploaded_file($_FILES['imagen_update']['tmp_name'])) {
-                            $missatge = 'No s\'ha pujat cap imatge.';
-                        } else {
-                            $file = $_FILES['imagen_update'];
-                            if ($file['error'] === UPLOAD_ERR_OK) {
-                                $allowed = ['image/jpeg' => '.jpg', 'image/png' => '.png', 'image/gif' => '.gif', 'image/webp' => '.webp'];
-                                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                                $mime = finfo_file($finfo, $file['tmp_name']);
-                                finfo_close($finfo);
-                                if (array_key_exists($mime, $allowed)) {
-                                    $ext = $allowed[$mime];
-                                    $safeName = preg_replace('/[^a-zA-Z0-9_-]/', '_', pathinfo($file['name'], PATHINFO_FILENAME));
-                                    $unique = $safeName . '_' . time() . bin2hex(random_bytes(4)) . $ext;
-                                    $destDir = realpath(__DIR__ . '/../../public/assets/img');
-                                    if ($destDir === false) {
-                                        $destDir = __DIR__ . '/../../public/assets/img';
-                                        if (!is_dir($destDir)) mkdir($destDir, 0755, true);
-                                        $destDir = realpath($destDir);
-                                    }
-                                    $destPath = $destDir . DIRECTORY_SEPARATOR . $unique;
-                                    if (move_uploaded_file($file['tmp_name'], $destPath)) {
-                                        $ruta_db = 'public/assets/img/' . $unique;
-                                        // Actualitzar la BD
-                                        $missatge = modificarDada($id, 'ruta_img', $ruta_db);
-                                        // Si s'ha actualitzat amb èxit, esborrar la imatge anterior si no és la default
-                                        if (strpos($missatge, 'correctament') !== false || strpos($missatge, 'actualitzat') !== false) {
-                                            $prevRuta = $row['ruta_img'] ?? null;
-                                            $default = 'public/assets/img/default.webp';
-                                            if (!empty($prevRuta) && $prevRuta !== $default) {
-                                                $prevPath = realpath(__DIR__ . '/../../' . $prevRuta);
-                                                if ($prevPath && file_exists($prevPath)) {
-                                                    @unlink($prevPath);
-                                                }
-                                            }
-                                            if (session_status() !== PHP_SESSION_ACTIVE) session_start();
-                                            $_SESSION['flash'] = $missatge;
-                                            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
-                                            exit;
-                                        }
-                                    } else {
-                                        $missatge = 'Error al desar la imatge.';
-                                    }
-                                } else {
-                                    $missatge = 'Tipus de fitxer no permès.';
-                                }
-                            } else {
-                                $missatge = 'Error en la pujada de la imatge.';
-                            }
-                        }
-                    } else {
-                        // Actualització d'un camp normal (marca/model)
-                        if (trim($camp) === '' || trim($dadaN) === '') {
-                            $missatge = 'Camp o dada nova no poden estar buits';
-                        } else {
-                            $missatge = modificarDada($id, $camp, $dadaN);
-                            // Redirigir si la modificació va ser exitosa
-                            if (strpos($missatge, 'correctament') !== false || strpos($missatge, 'actualitzat') !== false) {
-                                if (session_status() !== PHP_SESSION_ACTIVE) session_start();
-                                $_SESSION['flash'] = $missatge;
-                                header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
-                                exit;
-                            }
-                        }
-                    }
-                }
-            } catch (PDOException $e) {
-                $missatge = 'Error a la base de dades: ' . $e->getMessage();
-            }
+        // Cridem a la funció del controlador
+        $result = process_update_article($id, $camp, $dadaN, $image_file);
+        $missatge = $result['message'];
+
+        // Si la modificació va bé, redirigim
+        if ($result['success']) {
+            if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+            $_SESSION['flash'] = $missatge;
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
+            exit;
         }
     }
 }

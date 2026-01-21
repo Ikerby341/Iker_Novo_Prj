@@ -1,5 +1,7 @@
 <?php
 // Incloure el controlador que conté les funcions de creació
+include_once __DIR__ . '/../../config/app.php';
+include_once __DIR__ . '/../Controller/controlador.php';
 include_once __DIR__ . '/../Controller/crud_controller.php';
 
 // Inicialitzem la variable que contindrà el missatge de resposta
@@ -7,43 +9,12 @@ $missatge = '';
 
 // Comprovem si s'ha enviat el formulari (mètode POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Obtenim les dades del formulari
     $titol = $_POST['titol'] ?? '';
     $cos = $_POST['cos'] ?? '';
+    $image_file = $_FILES['imagen'] ?? null;
 
-    // Processar la imatge si s'ha pujat
-    $ruta_db = null; // per defecte no passem ruta i deixem la BD aplicar el default
-    if (isset($_FILES['imagen']) && isset($_FILES['imagen']['tmp_name']) && is_uploaded_file($_FILES['imagen']['tmp_name'])) {
-        $file = $_FILES['imagen'];
-        if ($file['error'] === UPLOAD_ERR_OK) {
-            $allowed = ['image/jpeg' => '.jpg', 'image/png' => '.png', 'image/gif' => '.gif', 'image/webp' => '.webp'];
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $mime = finfo_file($finfo, $file['tmp_name']);
-            finfo_close($finfo);
-            if (array_key_exists($mime, $allowed)) {
-                $ext = $allowed[$mime];
-                // Generar nom segur per a la imatge
-                $safeName = preg_replace('/[^a-zA-Z0-9_-]/', '_', pathinfo($file['name'], PATHINFO_FILENAME));
-                $unique = $safeName . '_' . time() . bin2hex(random_bytes(4)) . $ext;
-                // Destí: carpeta public/assets/img
-                $destDir = realpath(__DIR__ . '/../../public/assets/img');
-                if ($destDir === false) {
-                    // crear carpeta si no existeix
-                    $destDir = __DIR__ . '/../../public/assets/img';
-                    if (!is_dir($destDir)) mkdir($destDir, 0755, true);
-                    $destDir = realpath($destDir);
-                }
-                $destPath = $destDir . DIRECTORY_SEPARATOR . $unique;
-                if (move_uploaded_file($file['tmp_name'], $destPath)) {
-                    // Guardem la ruta tal com vols: començar per public/
-                    $ruta_db = 'public/assets/img/' . $unique;
-                }
-            }
-        }
-    }
-
-    // Cridem a la funció per inserir les dades i guardem el resultat
-    $missatge = inserirDada($titol, $cos, $ruta_db);
+    // Cridem a la funció del controlador
+    $missatge = process_create_article($titol, $cos, $image_file);
 }
 ?>
 

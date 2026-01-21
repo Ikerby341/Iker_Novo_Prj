@@ -32,6 +32,7 @@
                                     <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/admin.php">Gestionar usuaris</a>
                                 <?php endif; ?>
                                 <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/editprofile.php">Editar perfil</a>
+                                <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/changepassword.php">Canviar contrasenya</a>
                                 <a href="?logout=1">Tancar sessió</a>
                             </div>
                         </div>
@@ -171,9 +172,9 @@
                         html += '<input type="hidden" name="id" value="' + id + '">';
                         html += '<button type="submit" class="edit-btn" title="Editar">✏️</button>';
                         html += '</form>';
-                        html += '<form method="post" action="app/View/delete.php">';
+                        html += '<form method="post" action="app/View/delete.php" onsubmit="return confirm(\'Estàs segur que vols eliminar aquest article?\')">';
                         html += '<input type="hidden" name="id" value="' + id + '">';
-                        html += '<button type="submit" class="delete-btn" title="Esborrar" onclick="return confirm(\'Est\'as segur que vols eliminar aquest article?\')">🗑️</button>';
+                        html += '<button type="submit" class="delete-btn" title="Esborrar">🗑️</button>';
                         html += '</form>';
                         html += '</div>';
                     }

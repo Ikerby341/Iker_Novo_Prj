@@ -169,4 +169,52 @@ function login_user($username, $password, $remember = false) {
     return ['success' => true, 'errors' => []];
 }
 
+/**
+ * change_password
+ * Procesa el canvi de contrasenya per a un usuari autenticat
+ * Retorna array('success'=>bool,'message'=>string)
+ */
+function change_password($user_id, $current_password, $new_password, $confirm_password) {
+    require_once __DIR__ . '/../../config/db-connection.php';
+    
+    $current_password = trim($current_password);
+    $new_password = trim($new_password);
+    $confirm_password = trim($confirm_password);
+
+    // Validacions bàsiques
+    if (empty($current_password)) {
+        return ['success' => false, 'message' => 'La contrasenya actual no pot estar buida'];
+    } elseif (empty($new_password)) {
+        return ['success' => false, 'message' => 'La nova contrasenya no pot estar buida'];
+    } elseif (empty($confirm_password)) {
+        return ['success' => false, 'message' => 'La confirmació de contrasenya no pot estar buida'];
+    } elseif ($new_password !== $confirm_password) {
+        return ['success' => false, 'message' => 'La nova contrasenya i la confirmació no coincideixen'];
+    } elseif (strlen($new_password) < 6) {
+        return ['success' => false, 'message' => 'La nova contrasenya ha de tenir almenys 6 caràcters'];
+    }
+
+    try {
+        // Obtenir la contrasenya actual de la BD
+        $stmt = $connexio->prepare('SELECT password FROM usuarios WHERE id = ? LIMIT 1');
+        $stmt->execute([$user_id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            return ['success' => false, 'message' => 'Usuari no trobat'];
+        } elseif (!password_verify($current_password, $row['password'])) {
+            return ['success' => false, 'message' => 'La contrasenya actual és incorrecta'];
+        }
+
+        // Actualitzar la contrasenya a la BD
+        $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
+        $update_stmt = $connexio->prepare('UPDATE usuarios SET password = ? WHERE id = ?');
+        $update_stmt->execute([$hashed_password, $user_id]);
+
+        return ['success' => true, 'message' => '✓ Contrasenya actualitzada correctament'];
+    } catch (PDOException $e) {
+        return ['success' => false, 'message' => 'Error a la base de dades: ' . $e->getMessage()];
+    }
+}
+
 ?>

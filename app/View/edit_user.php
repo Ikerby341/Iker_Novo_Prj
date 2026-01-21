@@ -1,5 +1,7 @@
 <?php
+    include_once __DIR__ . '/../../config/app.php';
     include_once __DIR__ . '/../Controller/controlador.php';
+    include_once __DIR__ . '/../Controller/crud_controller.php';
 
     // Verificar que sea admin
     if (!is_logged_in() || !is_admin()) {
@@ -33,50 +35,12 @@
         $newName = trim($_POST['username'] ?? '');
         $newEmail = trim($_POST['email'] ?? '');
         $newAdmin = (int)($_POST['admin'] ?? $user['admin']);
-        $msgs = [];
 
-        // Username: validar unicitat si cambió
-        if ($newName !== '' && $newName !== $user['username']) {
-            if (user_exists_by_username($newName)) {
-                $msgs[] = 'Aquest nom d\'usuari ja existeix.';
-            } else {
-                include_once __DIR__ . '/../Controller/crud_controller.php';
-                if (modificarUsername($user_id, $newName)) {
-                    $msgs[] = 'Nom d\'usuari actualitzat.';
-                    $user['username'] = $newName;
-                } else {
-                    $msgs[] = 'Error al actualitzar el nom d\'usuari.';
-                }
-            }
-        }
-
-        // Email
-        if ($newEmail !== '' && $newEmail !== $user['email']) {
-            include_once __DIR__ . '/../Controller/crud_controller.php';
-            if (modificarEmail($user_id, $newEmail)) {
-                $msgs[] = 'Email actualitzat.';
-                $user['email'] = $newEmail;
-            } else {
-                $msgs[] = 'Error al actualitzar l\'email.';
-            }
-        }
-
-        // Admin
-        if ((int)$newAdmin !== (int)$user['admin']) {
-            if (update_user_admin($user_id, $newAdmin)) {
-                $msgs[] = 'Estat admin actualitzat.';
-                $user['admin'] = $newAdmin;
-            } else {
-                $msgs[] = 'Error al actualitzar l\'estat admin.';
-            }
-        }
-
-        // Redirigir con mensaje
-        if (!empty($msgs)) {
-            $_SESSION['message'] = implode(' ', $msgs);
-        } else {
-            $_SESSION['message'] = 'No s\'ha realitzat cap canvi.';
-        }
+        // Cridem a la funció del controlador
+        $result = process_edit_user_admin($user_id, $newName, $newEmail, $newAdmin);
+        
+        // Guardar missatge en sessió i redirigir a admin.php
+        $_SESSION['message'] = implode(' ', $result['messages']);
         header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/admin.php' : '/app/View/admin.php'));
         exit;
     }

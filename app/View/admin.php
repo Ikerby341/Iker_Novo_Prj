@@ -1,6 +1,9 @@
 <?php
     // Incloure el controlador al principi per permetre redireccions amb headers
+    include_once __DIR__ . '/../../config/app.php';
     include_once __DIR__ . '/../Controller/controlador.php';
+    include_once __DIR__ . '/../Controller/crud_controller.php';
+    
     // Validar i possiblement redirigir si la pagina sol.licitada no existeix
     validar_pagina_solicitada();
 
@@ -10,11 +13,12 @@
         $user_id = (int)($_POST['user_id'] ?? 0);
 
         if ($action === 'delete' && $user_id > 0) {
-            // Esborrar usuari
-            if (delete_user($user_id)) {
-                $_SESSION['message'] = 'Usuari esborrat correctament.';
-            } else {
-                $_SESSION['error'] = 'Error a l\'esborrar l\'usuari.';
+            // Cridem a la funció del controlador
+            $result = process_delete_user_admin($user_id);
+            $_SESSION['message'] = $result['message'];
+            if (!$result['success']) {
+                $_SESSION['error'] = $result['message'];
+                unset($_SESSION['message']);
             }
         }
 

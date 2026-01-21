@@ -1,61 +1,28 @@
 <?php
 // Incloem el controlador que inicia la sessió i el model
+include_once __DIR__ . '/../../config/app.php';
 include_once __DIR__ . '/../Controller/controlador.php';
 include_once __DIR__ . '/../Controller/crud_controller.php';
 
 // Protegim l'accés: aquesta pàgina només es pot accedir via POST per esborrar
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    // Redirigim a la vista principal (no permetem GET)
     header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
     exit;
 }
 
-// Ara processem la petició POST
-// Verifiquem que l'usuari està identificat
-    if (!is_logged_in()) {
+// Verificar que l'usuari està identificat
+if (!is_logged_in()) {
     header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/login.php' : '/app/View/login.php'));
     exit;
 }
 
-$missatge = '';
 $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
-if ($id <= 0) {
-    $missatge = 'ID invàlida';
-    $_SESSION['flash'] = $missatge;
-    header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
-    exit;
-}
+$result = process_delete_article($id);
 
-// Verifiquem que l'article pertany a l'usuari abans d'esborrar
-    try {
-    global $connexio;
-    $stmt = $connexio->prepare('SELECT owner_id FROM coches WHERE ID = ? LIMIT 1');
-    $stmt->execute([$id]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$row) {
-        $missatge = 'Article no trobat';
-        $_SESSION['flash'] = $missatge;
-        header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
-        exit;
-    }
-    if ((int)$row['owner_id'] !== (int)($_SESSION['user_id'] ?? 0)) {
-        $missatge = 'No tens permís per esborrar aquest article';
-        $_SESSION['flash'] = $missatge;
-        header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
-        exit;
-    }
-
-    // Esborrar
-    $missatge = esborrarDada($id);
-    // Guardar missatge en sessió i redirigir a la vista principal
-    $_SESSION['flash'] = $missatge;
-    header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
-    exit;
-} catch (PDOException $e) {
-    $_SESSION['flash'] = 'Error en la base de dades: ' . $e->getMessage();
-    header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
-    exit;
-}
+// Guardar missatge en sessió i redirigir a la vista principal
+$_SESSION['flash'] = $result['message'];
+header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
+exit;
 ?>
 
 <!DOCTYPE html>

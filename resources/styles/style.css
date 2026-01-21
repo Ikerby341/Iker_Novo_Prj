@@ -367,7 +367,7 @@ footer {
   color: #14213d;
   border-radius: 6px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  min-width: 130px;
+  min-width: 180px;
   display: none;
   flex-direction: column;
   padding: 8px 0;
@@ -762,7 +762,7 @@ footer {
 }
 
 /* Improve inputs style */
-.form-container-adapted input[type="text"], .form-container-adapted input[type="email"] {
+.form-container-adapted input[type="text"], .form-container-adapted input[type="email"], .form-container-adapted input[type="password"] {
   font-size: 1.1rem;
   padding: 12px 15px;
   width: 100%;
@@ -772,7 +772,7 @@ footer {
   border: 1.5px solid #ccc;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
-.form-container-adapted input[type="text"]:focus, .form-container-adapted input[type="email"]:focus {
+.form-container-adapted input[type="text"]:focus, .form-container-adapted input[type="email"]:focus, .form-container-adapted input[type="password"]:focus {
   border-color: #0055a5;
   box-shadow: 0 0 8px rgba(0, 85, 165, 0.5);
   outline: none;
