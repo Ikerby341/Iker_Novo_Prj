@@ -217,4 +217,131 @@ function change_password($user_id, $current_password, $new_password, $confirm_pa
     }
 }
 
+function process_forgot_password($email) {
+    require_once __DIR__ . '/../../config/db-connection.php';
+    
+    $email = trim(strtolower($email));
+    
+    // Validar que l'email no estigui buit
+    if (empty($email)) {
+        return ['success' => false, 'message' => 'Si us plau, introdueix un correu electrònic.'];
+    }
+    
+    // Validar format email
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return ['success' => false, 'message' => 'Correu electrònic invàlid.'];
+    }
+    
+    try {
+        // Comprovar si l'usuari existeix
+        global $connexio;
+        $stmt = $connexio->prepare('SELECT id, username FROM usuarios WHERE email = ? LIMIT 1');
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Per seguretat, sempre mostrem el missatge positiu als usuaris
+        // (no revelarem si un email existeix o no)
+        if (!$user) {
+            return ['success' => true, 'message' => 'Si el correu electrònic existeix al nostre sistema, rebràs instruccions per restablir la contrasenya.'];
+        }
+        
+        // Generar token segur
+        try {
+            $token = bin2hex(random_bytes(32));
+        } catch (Exception $e) {
+            $token = bin2hex(openssl_random_pseudo_bytes(32));
+        }
+        
+        // Carregar configuració
+        $config = require __DIR__ . '/../../config/phpmailer.php';
+        
+        // Emmagatzemar el token a la BD amb expiration
+        $expires_at = date('Y-m-d H:i:s', strtotime($config['password_reset']['token_expiration']));
+        $update_stmt = $connexio->prepare('UPDATE usuarios SET reset_token = ?, reset_token_expires = ? WHERE id = ?');
+        $update_stmt->execute([$token, $expires_at, $user['id']]);
+        
+        // Generar el link de recuperació
+        $reset_link = 'http://localhost/Practiques/Backend/Iker_Novo_Prj/app/View/resetpassword.php?token=' . $token;
+        
+        // Preparar email
+        $to = $email;
+        $subject = $config['password_reset']['subject'];
+        
+        // HTML del correu
+        $html_body = '
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    body { font-family: Arial, sans-serif; color: #333; }
+                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                    .header { background-color: #0055a5; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+                    .content { background-color: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-radius: 0 0 5px 5px; }
+                    .button { display: inline-block; background-color: #0055a5; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+                    .footer { font-size: 12px; color: #666; margin-top: 20px; text-align: center; }
+                    .warning { color: #d9534f; font-size: 12px; margin-top: 15px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Recuperació de contrasenya</h1>
+                    </div>
+                    <div class="content">
+                        <p>Hola ' . htmlspecialchars($user['username']) . ',</p>
+                        <p>Has sol·licitat restablir la teva contrasenya. Si no vas sol·licitar això, ignora aquest correu.</p>
+                        <p>Fes clic al botó següent per restablir la teva contrasenya:</p>
+                        <center>
+                            <a href="' . htmlspecialchars($reset_link) . '" class="button" style="color: white;">Restablir contrasenya</a>
+                        </center>
+                        <p class="warning">⚠️ Aquest enllaç és vàlid només durant ' . htmlspecialchars($config['password_reset']['token_expiration']) . '.</p>
+                    </div>
+                    <div class="footer">
+                        <p>' . htmlspecialchars($config['from']['name']) . ' © ' . date('Y') . ' - Tots els drets reservats</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        ';
+        
+        // Text pla com alternativa
+        $plain_text = "Hola " . $user['username'] . ",\n\n" .
+                     "Has sol·licitat restablir la teva contrasenya.\n" .
+                     "Si no vas sol·licitar això, ignora aquest correu.\n\n" .
+                     "Accedeix a aquest link per restablir la contrasenya:\n" .
+                     $reset_link . "\n\n" .
+                     "Aquest enllaç és vàlid només durant " . $config['password_reset']['token_expiration'] . ".\n\n" .
+                     $config['from']['name'];
+        
+        // Enviar email amb SmtpMailer
+        try {
+            require_once __DIR__ . '/SmtpMailer.php';
+            
+            $mailer = new SmtpMailer(
+                $config['smtp']['host'],
+                $config['smtp']['port'],
+                $config['auth']['username'],
+                $config['auth']['password'],
+                $config['from']['email'],
+                $config['from']['name']
+            );
+            
+            $mailer->send($to, $subject, $html_body, $plain_text);
+            
+            return ['success' => true, 'message' => 'S\'ha enviat un correu amb les instruccions per restablir la contrasenya. Revisa la teva safata d\'entrada.'];
+            
+        } catch (Exception $e) {
+            error_log('Email sending error: ' . $e->getMessage());
+            return ['success' => false, 'message' => 'Ha ocorregut un error en enviar el correu. Si us plau, intenta-ho més tard.'];
+        }
+        
+    } catch (PDOException $e) {
+        error_log('Database Error: ' . $e->getMessage());
+        return ['success' => true, 'message' => 'Si el correu electrònic existeix al nostre sistema, rebràs instruccions per restablir la contrasenya.'];
+    } catch (Exception $e) {
+        error_log('Error: ' . $e->getMessage());
+        return ['success' => true, 'message' => 'Si el correu electrònic existeix al nostre sistema, rebràs instruccions per restablir la contrasenya.'];
+    }
+}
+
 ?>

@@ -39,7 +39,7 @@
                     <?php else: ?>
                         <div class="signin" id="signin">
                             <button id="signinBtn" class="signin-btn" aria-haspopup="true" aria-expanded="false">🔐 Sign-in</button>
-                            <div id="signinDropdown" class="signin-dropdown" aria-hidden="true">
+                            <div id="signinDropdown" class="signin-dropdown" aria-hidden="true" style="min-width: 130px;">
                                 <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/login.php">Iniciar sessió</a>
                                 <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/register.php">Registrar-se</a>
                             </div>

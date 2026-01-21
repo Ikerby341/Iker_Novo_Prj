@@ -83,7 +83,8 @@
 
                     <label for="password">Contrasenya:</label>
                     <br>
-                    <input class="nice-input" type="password" id="password" name="password" required><br><br>
+                    <input class="nice-input" type="password" id="password" name="password" required><br>
+                    <span class="login-pass-text"><a href="forgotpassword.php">Contrasenya oblidada?</a></span><br>
                     <?php if (session_status() !== PHP_SESSION_ACTIVE) session_start();
                           $attempts = isset($_SESSION['login_attempts']) ? (int)$_SESSION['login_attempts'] : 0;
                     ?>
