@@ -97,7 +97,10 @@
 
                     <label for="password">Contrasenya:</label>
                     <br>
-                    <input class="nice-input" type="password" id="password" name="password" required><br>
+                    <div class="password-container">
+                        <input class="nice-input" type="password" id="password" name="password" required>
+                        <button type="button" class="toggle-password" data-target="password">👁️</button>
+                    </div>
                     <span class="login-pass-text"><a href="forgotpassword.php">Contrasenya oblidada?</a></span><br>
                     <?php if (session_status() !== PHP_SESSION_ACTIVE) session_start();
                           $attempts = isset($_SESSION['login_attempts']) ? (int)$_SESSION['login_attempts'] : 0;
@@ -133,6 +136,23 @@
         </footer>
     </body>
     <script>
+        // Toggle password visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.toggle-password').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var targetId = this.getAttribute('data-target');
+                    var input = document.getElementById(targetId);
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        this.textContent = '🙈';
+                    } else {
+                        input.type = 'password';
+                        this.textContent = '👁️';
+                    }
+                });
+            });
+        });
+
         // Auto-focus i select en el camp amb error
         (function(){
             var errorField = '<?php echo $firstErrorField; ?>';

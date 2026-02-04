@@ -57,15 +57,24 @@
             <form method="POST" action="">
                 <!-- Camp per la contrasenya actual -->
                 <label for="current_password">Contrasenya actual:</label><br>
-                <input type="password" name="current_password" id="current_password" required><br>
+                <div class="password-container">
+                    <input type="password" name="current_password" id="current_password">
+                    <button type="button" class="toggle-password" data-target="current_password">👁️</button>
+                </div><br>
 
                 <!-- Camp per la nova contrasenya -->
                 <label for="new_password">Nova contrasenya:</label><br>
-                <input type="password" name="new_password" id="new_password" required><br>
+                <div class="password-container">
+                    <input type="password" name="new_password" id="new_password" required>
+                    <button type="button" class="toggle-password" data-target="new_password">👁️</button>
+                </div><br>
 
                 <!-- Camp per confirmar la nova contrasenya -->
                 <label for="confirm_password">Confirmar contrasenya:</label><br>
-                <input type="password" name="confirm_password" id="confirm_password" required><br>
+                <div class="password-container">
+                    <input type="password" name="confirm_password" id="confirm_password" required>
+                    <button type="button" class="toggle-password" data-target="confirm_password">👁️</button>
+                </div><br>
 
                 <div class="button-row">
                     <!-- Botó per tornar a la pàgina principal -->
@@ -82,5 +91,23 @@
             <div class="footer-small">Gràcies per visitar · <script>document.write(new Date().getFullYear());</script></div>
         </div>
     </footer>
+    <script>
+        // Toggle password visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.toggle-password').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var targetId = this.getAttribute('data-target');
+                    var input = document.getElementById(targetId);
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        this.textContent = '🙈';
+                    } else {
+                        input.type = 'password';
+                        this.textContent = '👁️';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

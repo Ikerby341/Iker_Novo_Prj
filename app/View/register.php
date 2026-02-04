@@ -84,7 +84,7 @@
                 <h2 class="login-title">Registrar-se</h2>
                 <?php
                     if (!empty($errors)) {
-                        // errors will be shown inside the form wrapper below
+                        // els errors es mostraran dins del wrapper del formulari a continuació
                     }
                 ?>
 
@@ -110,11 +110,17 @@
 
                     <label for="password">Contrasenya:</label>
                     <br>
-                    <input class="nice-input" type="password" id="password" name="password" required><br><br>
+                    <div class="password-container">
+                        <input class="nice-input" type="password" id="password" name="password" required>
+                        <button type="button" class="toggle-password" data-target="password">👁️</button>
+                    </div><br><br>
 
                     <label for="passwordC">Confirma la contrasenya:</label>
                     <br>
-                    <input class="nice-input" type="password" id="passwordC" name="passwordC" required><br><br>
+                    <div class="password-container">
+                        <input class="nice-input" type="password" id="passwordC" name="passwordC" required>
+                        <button type="button" class="toggle-password" data-target="passwordC">👁️</button>
+                    </div><br><br>
 
                     <div aria-label="captcha" class="g-recaptcha" data-sitekey="6LeULxksAAAAAOp7haCI_UB1FyVg2gG2QbhN71Cu"></div>
                     <br>
@@ -138,6 +144,23 @@
     </footer>
 </body>
 <script>
+    // Toggle password visibility
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.toggle-password').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var targetId = this.getAttribute('data-target');
+                var input = document.getElementById(targetId);
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.textContent = '🙈';
+                } else {
+                    input.type = 'password';
+                    this.textContent = '👁️';
+                }
+            });
+        });
+    });
+
     // Auto-focus i select en el camp amb error
     (function(){
         var errorField = '<?php echo $firstErrorField; ?>';

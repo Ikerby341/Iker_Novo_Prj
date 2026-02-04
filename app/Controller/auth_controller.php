@@ -177,7 +177,7 @@ function login_user_oauth($user_id) {
     if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 
     // Obtenir dades de l'usuari
-    $user = get_user_by_id($user_id); // Assuming this function exists
+    $user = get_user_by_id($user_id);
     if (!$user) {
         return ['success' => false, 'errors' => ['Usuari no trobat.']];
     }
@@ -199,15 +199,14 @@ function login_user_oauth($user_id) {
  */
 function change_password($user_id, $current_password, $new_password, $confirm_password) {
     require_once __DIR__ . '/../../config/db-connection.php';
+    global $connexio;
     
     $current_password = trim($current_password);
     $new_password = trim($new_password);
     $confirm_password = trim($confirm_password);
 
     // Validacions bàsiques
-    if (empty($current_password)) {
-        return ['success' => false, 'message' => 'La contrasenya actual no pot estar buida'];
-    } elseif (empty($new_password)) {
+    if (empty($new_password)) {
         return ['success' => false, 'message' => 'La nova contrasenya no pot estar buida'];
     } elseif (empty($confirm_password)) {
         return ['success' => false, 'message' => 'La confirmació de contrasenya no pot estar buida'];
@@ -225,8 +224,18 @@ function change_password($user_id, $current_password, $new_password, $confirm_pa
 
         if (!$row) {
             return ['success' => false, 'message' => 'Usuari no trobat'];
-        } elseif (!password_verify($current_password, $row['password'])) {
-            return ['success' => false, 'message' => 'La contrasenya actual és incorrecta'];
+        }
+
+        // Si l'usuari no té contrasenya (OAuth), permetre canviar sense verificar l'actual
+        if (empty($row['password'])) {
+            if (!empty($current_password)) {
+                return ['success' => false, 'message' => 'No tens contrasenya actual. Deixa el camp buit.'];
+            }
+        } else {
+            // Verificar contrasenya actual
+            if (!password_verify($current_password, $row['password'])) {
+                return ['success' => false, 'message' => 'La contrasenya actual és incorrecta'];
+            }
         }
 
         // Actualitzar la contrasenya a la BD

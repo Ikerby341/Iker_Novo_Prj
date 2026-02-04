@@ -97,10 +97,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $token_valid) {
         <?php if ($token_valid && empty($message)): ?>
             <form method="POST">
                 <label for="new_password">Nova contrasenya:</label>
-                <input type="password" id="new_password" name="new_password" required>
+                <div class="password-container">
+                    <input type="password" id="new_password" name="new_password" required>
+                    <button type="button" class="toggle-password" data-target="new_password">👁️</button>
+                </div>
                 
-       L'enllaç de recuperació és invàlid o ha caduca         <label for="confirm_password">Confirma la contrasenya:</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
+                <label for="confirm_password">Confirma la contrasenya:</label>
+                <div class="password-container">
+                    <input type="password" id="confirm_password" name="confirm_password" required>
+                    <button type="button" class="toggle-password" data-target="confirm_password">👁️</button>
+                </div>
                 
                 <div class="button-group">
                     <button type="submit" class="btn btn-primary">Restablir contrasenya</button>
@@ -124,5 +130,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $token_valid) {
             <div class="footer-small">Gràcies per visitar · <script>document.write(new Date().getFullYear());</script></div>
         </div>
     </footer>
+    <script>
+        // Toggle password visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.toggle-password').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var targetId = this.getAttribute('data-target');
+                    var input = document.getElementById(targetId);
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        this.textContent = '🙈';
+                    } else {
+                        input.type = 'password';
+                        this.textContent = '👁️';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

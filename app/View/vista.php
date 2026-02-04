@@ -53,7 +53,7 @@
     <h1>Cotxes</h1>
     <div class="divPrincipal">
         <?php
-            // Mostrar mensaje flash si existe (usar formato informacional azul similar a .form-errors)
+            // Mostrar missatge flash si existeix (usar format informacional blau similar a .form-errors)
             if (isset($_SESSION['flash']) && $_SESSION['flash'] !== '') {
                 $msg = htmlspecialchars($_SESSION['flash']);
                 echo '<div class="form-info"><span class="info-icon">ℹ️</span><span class="info-text">' . $msg . '</span></div>';
@@ -264,7 +264,7 @@
             });
 
             input.addEventListener('change', function(){
-                // 'change' fires when input loses focus or Enter pressed — keep for fallback
+                // 'change' s'activa quan l'input perd el focus o es prem Enter — mantenir per fallback
                 renderPage(all, 1);
             });
 
@@ -275,11 +275,11 @@
                 }
             });
 
-            // Event listener para el selector de ordenamiento
+            // Oient d'esdeveniments per al selector d'ordenament
             if (orderby) {
                 orderby.addEventListener('change', function(){
                     const val = this.value;
-                    // Parse the URL to extract sort and dir
+                    // Analitzar la URL per extreure sort i dir
                     const urlParams = new URLSearchParams(val.split('?')[1] || '');
                     currentSort = urlParams.get('sort') || 'ID';
                     currentDir = urlParams.get('dir') || 'ASC';
@@ -292,7 +292,7 @@
         })();
     </script>
     <script>
-        // Dropdown para Sign-in: abre/cierra y cierra al click fuera o ESC
+        // Dropdown per a Sign-in: obre/tanca i tanca al clic fora o ESC
         (function(){
             const signinBtn = document.getElementById('signinBtn');
             const signinDropdown = document.getElementById('signinDropdown');
