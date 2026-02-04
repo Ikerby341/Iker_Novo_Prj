@@ -1,1 +1,2 @@
-config/phpmailer.php
+config/mailer.php
+.env

@@ -253,7 +253,7 @@ function process_forgot_password($email) {
         }
         
         // Carregar configuració
-        $config = require __DIR__ . '/../../config/phpmailer.php';
+        $config = require __DIR__ . '/../../config/mailer.php';
         
         // Emmagatzemar el token a la BD amb expiration
         $expires_at = date('Y-m-d H:i:s', strtotime($config['password_reset']['token_expiration']));
@@ -328,7 +328,7 @@ function process_forgot_password($email) {
             
             $mailer->send($to, $subject, $html_body, $plain_text);
             
-            return ['success' => true, 'message' => 'S\'ha enviat un correu amb les instruccions per restablir la contrasenya. Revisa la teva safata d\'entrada.'];
+            return ['success' => true, 'message' => 'Si el correu electrònic existeix al nostre sistema, rebràs instruccions per restablir la contrasenya.'];
             
         } catch (Exception $e) {
             error_log('Email sending error: ' . $e->getMessage());

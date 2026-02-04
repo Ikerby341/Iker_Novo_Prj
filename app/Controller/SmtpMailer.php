@@ -2,7 +2,7 @@
 
 /**
  * SmtpMailer.php
- * Classe simple per enviar correus via SMTP sense necessitat de PHPMailer
+ * Classe simple per enviar correus via SMTP
  */
 
 class SmtpMailer {
