@@ -170,6 +170,29 @@ function login_user($username, $password, $remember = false) {
 }
 
 /**
+ * login_user_oauth
+ * Inicia sessió per a usuaris OAuth sense contrasenya
+ */
+function login_user_oauth($user_id) {
+    if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+
+    // Obtenir dades de l'usuari
+    $user = get_user_by_id($user_id); // Assuming this function exists
+    if (!$user) {
+        return ['success' => false, 'errors' => ['Usuari no trobat.']];
+    }
+
+    // Iniciar sessió
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['admin'] = isset($user['admin']) ? $user['admin'] : false;
+    $_SESSION['created'] = time();
+    $_SESSION['last_activity'] = time();
+
+    return ['success' => true, 'errors' => []];
+}
+
+/**
  * change_password
  * Procesa el canvi de contrasenya per a un usuari autenticat
  * Retorna array('success'=>bool,'message'=>string)

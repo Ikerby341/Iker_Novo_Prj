@@ -154,4 +154,55 @@ function update_user_admin($id, $is_admin) {
     }
 }
 
+/**
+ * get_user_by_id
+ * Retorna un array amb les dades de l'usuari o false si no existeix
+ */
+function get_user_by_id($id) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('SELECT * FROM usuarios WHERE id = :id LIMIT 1');
+        $stmt->execute([':id' => $id]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user ? $user : false;
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * get_user_by_discord_id
+ * Retorna un array amb les dades de l'usuari o false si no existeix
+ */
+function get_user_by_discord_id($discord_id) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('SELECT * FROM usuarios WHERE discord_id = :d LIMIT 1');
+        $stmt->execute([':d' => $discord_id]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user ? $user : false;
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * create_user_oauth
+ * Crea un usuari amb OAuth, sense contrasenya
+ */
+function create_user_oauth($username, $email, $discord_id, $oauth_provider = 'discord') {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('INSERT INTO usuarios (username, email, discord_id, oauth_provider) VALUES (:u, :e, :d, :p)');
+        return $stmt->execute([
+            ':u' => $username,
+            ':e' => $email,
+            ':d' => $discord_id,
+            ':p' => $oauth_provider
+        ]);
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
 ?>

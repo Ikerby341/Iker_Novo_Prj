@@ -968,3 +968,26 @@ table a button:hover {
 .btn-secondary:hover {
   background-color: #5a6268;
 }
+
+.discord-btn {
+  background-color: #5865f2;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  text-decoration: none;
+  padding: 0;
+}
+
+.discord-btn:hover {
+  background-color: #4752c4;
+}
+
+.discord-icon {
+  width: 30px;
+  height: 30px;
+  vertical-align: middle;
+}
