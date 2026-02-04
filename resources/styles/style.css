@@ -311,6 +311,10 @@ footer {
   min-height: 40px;
   font-size: 15px;
   line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 }
 
 .menu:hover {
@@ -353,6 +357,10 @@ footer {
   min-height: 40px;
   font-size: 15px;
   line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
 }
 
 .signin-btn:hover {
