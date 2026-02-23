@@ -1000,6 +1000,41 @@ table a button:hover {
   vertical-align: middle;
 }
 
+/* GitHub button: same size as Discord but white background */
+.github-btn {
+  background-color: #ffffff;
+  color: #000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 4px;
+  text-decoration: none;
+  padding: 0;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.github-btn:hover {
+  background-color: #f2f2f2;
+}
+
+.github-icon {
+  width: 30px;
+  height: 30px;
+  vertical-align: middle;
+  display: block;
+}
+
+/* Container to center OAuth buttons */
+.oauth-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 12px;
+}
+
 .password-container {
   position: relative;
   display: inline-block;

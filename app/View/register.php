@@ -130,8 +130,15 @@
             </div> 
         </div>
         <div class="login-footer">
-            <a href="https://discord.com/api/oauth2/authorize?client_id=<?php echo getenv('DISCORD_CLIENT_ID'); ?>&redirect_uri=<?php echo urlencode(getenv('DISCORD_REDIRECT_URI')); ?>&response_type=code&scope=identify%20email" class="btn discord-btn"><img src="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>public/assets/img/discord.webp" alt="Discord" class="discord-icon"></a>
-            <br><br>
+            <div class="oauth-buttons">
+                <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>public/github_login.php" class="github-btn" aria-label="Registrar con GitHub">
+                    <img src="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>public/assets/img/github.webp" alt="GitHub" class="github-icon">
+                </a>
+                <a href="https://discord.com/api/oauth2/authorize?client_id=<?php echo getenv('DISCORD_CLIENT_ID'); ?>&redirect_uri=<?php echo urlencode(getenv('DISCORD_REDIRECT_URI')); ?>&response_type=code&scope=identify%20email" class="discord-btn" aria-label="Registrar con Discord">
+                    <img src="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>public/assets/img/discord.webp" alt="Discord" class="discord-icon">
+                </a>
+            </div>
+            <br>
             <p class="login-text">Ja tens compte? <a style="color: blue;" href="login.php">Inicia sessió aquí</a></p>
         </div>
     </section>

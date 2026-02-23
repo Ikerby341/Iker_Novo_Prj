@@ -205,4 +205,53 @@ function create_user_oauth($username, $email, $discord_id, $oauth_provider = 'di
     }
 }
 
+/**
+ * get_user_by_github_id
+ * Retorna un array amb les dades de l'usuari o false si no existeix
+ */
+function get_user_by_github_id($github_id) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('SELECT * FROM usuarios WHERE github_id = :g LIMIT 1');
+        $stmt->execute([':g' => $github_id]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user ? $user : false;
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * create_user_oauth_github
+ * Crea un usuari amb dades d'OAuth de GitHub
+ */
+function create_user_oauth_github($username, $email, $github_id, $hybridauth_provider = 'github') {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('INSERT INTO usuarios (username, email, github_id, hybridauth_provider) VALUES (:u, :e, :g, :p)');
+        return $stmt->execute([
+            ':u' => $username,
+            ':e' => $email,
+            ':g' => $github_id,
+            ':p' => $hybridauth_provider
+        ]);
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * update_user_github_link
+ * Enlaza un usuario existente con GitHub (guarda github_id y provider)
+ */
+function update_user_github_link($userId, $github_id, $hybridauth_provider = 'github') {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('UPDATE usuarios SET github_id = :g, hybridauth_provider = :p WHERE id = :id');
+        return $stmt->execute([':g' => $github_id, ':p' => $hybridauth_provider, ':id' => $userId]);
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
 ?>
