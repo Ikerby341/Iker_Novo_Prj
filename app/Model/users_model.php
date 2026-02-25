@@ -190,15 +190,14 @@ function get_user_by_discord_id($discord_id) {
  * create_user_oauth
  * Crea un usuari amb OAuth, sense contrasenya
  */
-function create_user_oauth($username, $email, $discord_id, $oauth_provider = 'discord') {
+function create_user_oauth($username, $email, $discord_id) {
     global $connexio;
     try {
-        $stmt = $connexio->prepare('INSERT INTO usuarios (username, email, discord_id, oauth_provider) VALUES (:u, :e, :d, :p)');
+        $stmt = $connexio->prepare('INSERT INTO usuarios (username, email, discord_id) VALUES (:u, :e, :d)');
         return $stmt->execute([
             ':u' => $username,
             ':e' => $email,
-            ':d' => $discord_id,
-            ':p' => $oauth_provider
+            ':d' => $discord_id
         ]);
     } catch (PDOException $e) {
         return false;
@@ -225,15 +224,14 @@ function get_user_by_github_id($github_id) {
  * create_user_oauth_github
  * Crea un usuari amb dades d'OAuth de GitHub
  */
-function create_user_oauth_github($username, $email, $github_id, $hybridauth_provider = 'github') {
+function create_user_oauth_github($username, $email, $github_id) {
     global $connexio;
     try {
-        $stmt = $connexio->prepare('INSERT INTO usuarios (username, email, github_id, hybridauth_provider) VALUES (:u, :e, :g, :p)');
+        $stmt = $connexio->prepare('INSERT INTO usuarios (username, email, github_id) VALUES (:u, :e, :g)');
         return $stmt->execute([
             ':u' => $username,
             ':e' => $email,
-            ':g' => $github_id,
-            ':p' => $hybridauth_provider
+            ':g' => $github_id
         ]);
     } catch (PDOException $e) {
         return false;
@@ -244,11 +242,11 @@ function create_user_oauth_github($username, $email, $github_id, $hybridauth_pro
  * update_user_github_link
  * Enlaza un usuario existente con GitHub (guarda github_id y provider)
  */
-function update_user_github_link($userId, $github_id, $hybridauth_provider = 'github') {
+function update_user_github_link($userId, $github_id) {
     global $connexio;
     try {
-        $stmt = $connexio->prepare('UPDATE usuarios SET github_id = :g, hybridauth_provider = :p WHERE id = :id');
-        return $stmt->execute([':g' => $github_id, ':p' => $hybridauth_provider, ':id' => $userId]);
+        $stmt = $connexio->prepare('UPDATE usuarios SET github_id = :g WHERE id = :id');
+        return $stmt->execute([':g' => $github_id, ':id' => $userId]);
     } catch (PDOException $e) {
         return false;
     }

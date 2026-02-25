@@ -1,5 +1,5 @@
 <?php
-// Procesa formularis de login i registre
+// Processa formularis d'inici de sessió i registre
 include_once __DIR__ . '/controlador.php';
 
 // Si no és POST, redirigim
@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Distingeix registre vs login per la presència de passwordC o email
+// Distingeix registre vs inici de sessió per la presència de passwordC o email
 if (isset($_POST['passwordC']) || isset($_POST['email'])) {
     // registre
     $username = $_POST['username'] ?? '';
@@ -18,7 +18,7 @@ if (isset($_POST['passwordC']) || isset($_POST['email'])) {
 
     $res = register_user($username, $email, $password, $password_confirm);
     if ($res['success']) {
-        // redirigim al login amb missatge opcional
+        // redirigim a l'inici de sessió amb missatge opcional
         header('Location: ' . (defined('BASE_URL') ? BASE_URL : '/'));
         exit;
     } else {
@@ -30,7 +30,7 @@ if (isset($_POST['passwordC']) || isset($_POST['email'])) {
         exit;
     }
 } else {
-    // login
+    // inici de sessió
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
     $remember = isset($_POST['rememberMe']) && $_POST['rememberMe'] ? true : false;

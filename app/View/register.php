@@ -131,7 +131,7 @@
         </div>
         <div class="login-footer">
             <div class="oauth-buttons">
-                <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>public/github_login.php" class="github-btn" aria-label="Registrar con GitHub">
+                <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>public/index.php?action=github_login" class="github-btn" aria-label="Registrar con GitHub">
                     <img src="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>public/assets/img/github.webp" alt="GitHub" class="github-icon">
                 </a>
                 <a href="https://discord.com/api/oauth2/authorize?client_id=<?php echo getenv('DISCORD_CLIENT_ID'); ?>&redirect_uri=<?php echo urlencode(getenv('DISCORD_REDIRECT_URI')); ?>&response_type=code&scope=identify%20email" class="discord-btn" aria-label="Registrar con Discord">

@@ -1,8 +1,8 @@
 <?php
-require_once __DIR__ . '/../../config/mailer.php'; // Load env
+require_once __DIR__ . '/../../config/mailer.php'; // Carrega .env
 require_once __DIR__ . '/../Model/users_model.php';
 require_once __DIR__ . '/auth_controller.php'; // Per a les funcions d'inici de sessió
-require_once 'session_controller.php'; // Assuming session handling
+require_once 'session_controller.php'; // Assumeix gestió de sessions
 
 $client_id = getenv('DISCORD_CLIENT_ID');
 $client_secret = getenv('DISCORD_CLIENT_SECRET');
@@ -56,7 +56,7 @@ if (isset($_GET['code'])) {
             // Comprovar si l'usuari existeix
             $user = get_user_by_discord_id($discord_id);
             if ($user) {
-                // Login
+                    // Inici de sessió
                 login_user_oauth($user['id']);
                 header('Location: /Practiques/Backend/Iker_Novo_Prj/app/View/vista.php');
                 exit;

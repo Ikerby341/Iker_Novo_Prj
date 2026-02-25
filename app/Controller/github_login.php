@@ -1,11 +1,11 @@
 <?php
 // Inicia flujo Hybridauth -> GitHub (usa vendor/autoload.php)
-require_once __DIR__ . '/../config/mailer.php'; // carga .env
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../../config/mailer.php'; // carrega .env
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 use Hybridauth\Hybridauth;
 
-$config = require __DIR__ . '/../config/hybridauth.php';
+    $config = require __DIR__ . '/../../config/hybridauth.php';
 
 try {
     $hybridauth = new Hybridauth($config);

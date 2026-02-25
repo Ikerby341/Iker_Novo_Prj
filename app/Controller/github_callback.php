@@ -1,11 +1,11 @@
 <?php
-// Callback Hybridauth para GitHub (usa vendor/autoload.php)
-require_once __DIR__ . '/../config/mailer.php'; // carga .env
-require_once __DIR__ . '/../vendor/autoload.php';
+// Retorn de Hybridauth per GitHub (usa vendor/autoload.php)
+require_once __DIR__ . '/../../config/mailer.php'; // carrega .env
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 use Hybridauth\Hybridauth;
 
-$config = require __DIR__ . '/../config/hybridauth.php';
+$config = require __DIR__ . '/../../config/hybridauth.php';
 
 try {
     $hybridauth = new Hybridauth($config);
@@ -17,9 +17,9 @@ try {
     exit;
 }
 
-// Procesamiento del perfil: buscar/crear usuario y loguear
-require_once __DIR__ . '/../app/Model/users_model.php';
-require_once __DIR__ . '/../app/Controller/auth_controller.php';
+// Procesamiento del perfil: buscar/crear usuario i iniciar sessió
+require_once __DIR__ . '/../Model/users_model.php';
+require_once __DIR__ . '/auth_controller.php';
 
 $githubId = $userProfile->identifier ?? null;
 $email = $userProfile->email ?? null;
@@ -109,7 +109,7 @@ if ($user) {
         exit;
     }
 
-    // Fallback: intentar crear usuario mínimo sin columnas específicas
+    // Alternativa: intentar crear usuari mínim sense columnes específiques
     try {
         global $connexio;
         $stmt = $connexio->prepare('INSERT INTO usuarios (username, email) VALUES (:u, :e)');

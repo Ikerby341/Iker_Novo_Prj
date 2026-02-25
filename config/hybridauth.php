@@ -3,7 +3,7 @@
 require_once __DIR__ . '/mailer.php'; // carrega .env via putenv()
 
 return [
-    'callback' => getenv('GITHUB_REDIRECT_URI') ?: 'http://localhost/Practiques/Backend/Iker_Novo_Prj/public/github_callback.php',
+    'callback' => getenv('GITHUB_REDIRECT_URI') ?: 'http://localhost/Practiques/Backend/Iker_Novo_Prj/public/index.php?action=github_callback',
     'providers' => [
         'GitHub' => [
             'enabled' => true,

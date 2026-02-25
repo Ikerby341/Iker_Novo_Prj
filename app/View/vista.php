@@ -252,7 +252,7 @@
                     .replace(/'/g, '&#039;');
             }
 
-            // handlers
+            // gestors d'esdeveniments
             input.addEventListener('input', function(){
                 clearTimeout(debounceTimer);
                 const val = this.value;
@@ -264,7 +264,7 @@
             });
 
             input.addEventListener('change', function(){
-                // 'change' s'activa quan l'input perd el focus o es prem Enter — mantenir per fallback
+                // 'change' s'activa quan l'input perd el focus o es prem Enter — mantenir com a pla de reserva
                 renderPage(all, 1);
             });
 
