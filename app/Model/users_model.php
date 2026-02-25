@@ -188,7 +188,7 @@ function get_user_by_discord_id($discord_id) {
 
 /**
  * create_user_oauth
- * Crea un usuari amb OAuth, sense contrasenya
+ * Crea un usuari amb OAuth
  */
 function create_user_oauth($username, $email, $discord_id) {
     global $connexio;
@@ -240,7 +240,7 @@ function create_user_oauth_github($username, $email, $github_id) {
 
 /**
  * update_user_github_link
- * Enlaza un usuario existente con GitHub (guarda github_id y provider)
+ * Enlaza un usuario existente con GitHub (guarda github_id)
  */
 function update_user_github_link($userId, $github_id) {
     global $connexio;
