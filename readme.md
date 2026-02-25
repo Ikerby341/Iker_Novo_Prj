@@ -44,6 +44,28 @@ Funcionalitats principals
   - El projecte utilitza una constant `BASE_URL` per construir enllaços i rutes dins de les vistes i includes. Això evita rutes absolutes que depenguin d'una màquina o d'una estructura concreta de carpetes.
   - Per què s'ha creat: perquè l'aplicació funcioni correctament des de qualsevol màquina (localhost, un directori dins d'un servidor, o un entorn amb domini propi) sense haver de canviar manualment tots els enllaços de les vistes (Vaig haver d'afegir-ho ja que des de l'ordinador de casa no funcionaba i vaig veure que sense això depenia molt de que les rutes siguin les mateixes que les del meu portatil i això no ha de ser així).
 
+Novetats recents
+----------------
+- Entrades OAuth centralitzades: s'ha afegit un petit enrutador a `public/index.php` per manejar les accions `?action=github_login` i `?action=github_callback`. Això evita tenir fitxers públics separats per a cada callback i manté `public/` més net.
+- Integració GitHub amb Hybridauth: s'ha afegit suport per autenticar amb GitHub mitjançant la llibreria Hybridauth i la configuració a `config/hybridauth.php`. La URL de callback per defecte apunta a `public/index.php?action=github_callback` i la variable `GITHUB_REDIRECT_URI` es pot sobreescriure a `.env`.
+- OAuth amb Discord: hi ha un flux OAuth específic implementat manualment per Discord (`app/Controller/oauth_callback.php`) i una vista d'ajust per completar registre amb dades de Discord (`app/View/register_discord.php`).
+- Comentaris traduïts: s'han traduït a català diversos comentaris del codi per millorar la coherència de l'idioma dins del projecte.
+
+Comparativa: OAuth amb Discord (manual) vs Hybridauth amb GitHub
+-------------------------------------------------------------
+- Implementació:
+  - Discord: s'ha implementat manualment l'intercanvi de codi per token (petició POST a `https://discord.com/api/oauth2/token`) i la consulta de l'usuari (`/api/users/@me`) en `app/Controller/oauth_callback.php`.
+  - GitHub: s'utilitza la llibreria Hybridauth per encapsular el procés d'autenticació OAuth i la gestió dels adaptadors (provider) en `app/Controller/github_login.php` i `app/Controller/github_callback.php`.
+- Mantenibilitat i abstracció:
+  - Discord (manual): codi explícit i senzill d'entendre, però cal gestionar directament tokens, errors i peticions HTTP; si s'afegeix més providers, caldrà replicar lògica.
+  - GitHub (Hybridauth): Hybridauth ofereix abstracció i uniformitza la interacció amb múltiples providers (errors, obtenció de perfil, reconnects). A canvi afegeix una dependència externa i una petita corba d'aprenentatge.
+- Personalització:
+  - Discord: control total sobre com es processe el perfil i com es crea/enllaça l'usuari (més flexible a nivell específic del provider).
+  - Hybridauth: facilita la feina comuna (autenticació, obtenció de perfil), però per comportaments molt específics encara cal adaptar el codi després d'obtenir el perfil.
+- Requisits de configuració:
+  - Discord: només necessites `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET` i `DISCORD_REDIRECT_URI` a `.env`.
+  - GitHub/Hybridauth: a més dels `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` i `GITHUB_REDIRECT_URI` a `.env`, hybridauth també requereix `composer` i la carpeta `vendor/`.
+
 Estructura de fitxers rellevant
 -------------------------------
 - `index.php` (entrada pública / vista principal)
@@ -67,25 +89,3 @@ Credencials Administrador
 -------------------------
 - User: admin
 - Pass: Proba1234.
-
-Novetats recents
-----------------
-- Entrades OAuth centralitzades: s'ha afegit un petit enrutador a `public/index.php` per manejar les accions `?action=github_login` i `?action=github_callback`. Això evita tenir fitxers públics separats per a cada callback i manté `public/` més net.
-- Integració GitHub amb Hybridauth: s'ha afegit suport per autenticar amb GitHub mitjançant la llibreria Hybridauth i la configuració a `config/hybridauth.php`. La URL de callback per defecte apunta a `public/index.php?action=github_callback` i la variable `GITHUB_REDIRECT_URI` es pot sobreescriure a `.env`.
-- OAuth amb Discord: hi ha un flux OAuth específic implementat manualment per Discord (`app/Controller/oauth_callback.php`) i una vista d'ajust per completar registre amb dades de Discord (`app/View/register_discord.php`).
-- Comentaris traduïts: s'han traduït a català diversos comentaris del codi per millorar la coherència de l'idioma dins del projecte.
-
-Comparativa: OAuth amb Discord (manual) vs Hybridauth amb GitHub
--------------------------------------------------------------
-- Implementació:
-  - Discord: s'ha implementat manualment l'intercanvi de codi per token (petició POST a `https://discord.com/api/oauth2/token`) i la consulta de l'usuari (`/api/users/@me`) en `app/Controller/oauth_callback.php`.
-  - GitHub: s'utilitza la llibreria Hybridauth per encapsular el procés d'autenticació OAuth i la gestió dels adaptadors (provider) en `app/Controller/github_login.php` i `app/Controller/github_callback.php`.
-- Mantenibilitat i abstracció:
-  - Discord (manual): codi explícit i senzill d'entendre, però cal gestionar directament tokens, errors i peticions HTTP; si s'afegeix més providers, caldrà replicar lògica.
-  - GitHub (Hybridauth): Hybridauth ofereix abstracció i uniformitza la interacció amb múltiples providers (errors, obtenció de perfil, reconnects). A canvi afegeix una dependència externa i una petita corba d'aprenentatge.
-- Personalització:
-  - Discord: control total sobre com es processe el perfil i com es crea/enllaça l'usuari (més flexible a nivell específic del provider).
-  - Hybridauth: facilita la feina comuna (autenticació, obtenció de perfil), però per comportaments molt específics encara cal adaptar el codi després d'obtenir el perfil.
-- Requisits de configuració:
-  - Discord: només necessites `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET` i `DISCORD_REDIRECT_URI` a `.env`.
-  - GitHub/Hybridauth: a més dels `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` i `GITHUB_REDIRECT_URI` a `.env`, hybridauth també requereix `composer` i la carpeta `vendor/`.
