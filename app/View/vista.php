@@ -85,7 +85,7 @@
 
             <?php
                 // Precarreguem totes les dades al client per fer cerca local (només del propietari si està logat)
-                $allRows = listar_tots_articles(null);
+                $allRows = listar_tots_articles(is_logged_in(), is_logged_in() ? $_SESSION['user_id'] : null);
                 $jsRows = [];
                 foreach ($allRows as $r) {
                     $jsRows[] = [

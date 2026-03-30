@@ -30,7 +30,7 @@ function mostrar_articles($articlesPerPagina = 8) {
         if (in_array($d, ['ASC','DESC'])) $dir = $d;
     }
 
-    $articles = generar_articles($page, $perPage, $sort, $dir);
+    $articles = generar_articles($page, $perPage, $sort, $dir, is_logged_in(), is_logged_in() ? $_SESSION['user_id'] : null);
     
     if (is_array($articles)) {
         $sortida = '<div class="articles-grid">';
@@ -93,7 +93,7 @@ function mostrar_paginacio($articlesPerPagina = 8) {
         if (in_array($d, ['ASC','DESC'])) $dir = $d;
     }
 
-    $paginacioData = generar_paginacio($page, $perPage, $sort, $dir);
+    $paginacioData = generar_paginacio($page, $perPage, $sort, $dir, is_logged_in(), is_logged_in() ? $_SESSION['user_id'] : null);
 
     if ($paginacioData['totalPages'] <= 1) {
         return '';

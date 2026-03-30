@@ -146,3 +146,7 @@ Correccions PROJECTE FASE 3
 ### 12. Autenticació social (OAuth) i contrasenya
 - **Pràctica habitual**: Moltes webs famoses (Discord, Twitter, Microsoft, etc.) permeten crear un compte amb OAuth (Google, Facebook, etc.) i, posteriorment, afegir una contrasenya des de la configuració del compte. Això permet iniciar sessió tant amb OAuth com amb email/contrasenya, però només si l'usuari ha establert una contrasenya manualment després del registre social.
 - **Com està implementat aquí**: En aquest projecte, si un usuari es registra amb OAuth (ex: GitHub o Discord), el compte es crea sense contrasenya. Si després vol iniciar sessió amb email/contrasenya, primer ha d'establir una contrasenya (per exemple, mitjançant la funcionalitat de "recuperar contrasenya" o des de la configuració del perfil). Això segueix la pràctica habitual de grans plataformes i evita conflictes d'autenticació.
+
+### 13. Separació de capes: model crida funcions del controlador
+- **Problema identificat**: El model `articles_model.php` cridava funcions del controlador..
+- **Solució implementada**: S'han modificat les funcions del model (`generar_articles`, `generar_paginacio`, `obtenir_total_pagines`, `listar_tots_articles`) per rebre paràmetres (`$is_logged_in`, `$user_id`) en comptes de cridar funcions del controlador. Ara el controlador passa aquests valors quan crida les funcions del model, mantenint la separació de capes.

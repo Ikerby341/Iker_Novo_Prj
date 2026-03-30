@@ -5,9 +5,9 @@ require_once __DIR__ . '/../../config/db-connection.php';
  * genera_articles
  * Genera els articles segons la pagina actual i articles per pagina.
  * Retorna un array amb els articles.
- * paràmetres: $page (int), $articlesPerPagina (int)
+ * paràmetres: $page (int), $articlesPerPagina (int), $is_logged_in (bool), $user_id (int|null)
  */
-function generar_articles($page = 1, $articlesPerPagina = 3, $sort = 'ID', $dir = 'ASC') {
+function generar_articles($page = 1, $articlesPerPagina = 3, $sort = 'ID', $dir = 'ASC', $is_logged_in = false, $user_id = null) {
     global $connexio;
     try {
         $offset = ($page - 1) * $articlesPerPagina;
@@ -20,7 +20,7 @@ function generar_articles($page = 1, $articlesPerPagina = 3, $sort = 'ID', $dir 
         $orderClause = "ORDER BY $sort $dir";
 
         // Construir la consulta segons si l'usuari està autenticat
-        if (is_logged_in()) {
+        if ($is_logged_in && $user_id) {
             $query = "SELECT * FROM coches WHERE owner_id = :owner_id $orderClause LIMIT :limit OFFSET :offset";
         } else {
             $query = "SELECT * FROM coches $orderClause LIMIT :limit OFFSET :offset";
@@ -29,8 +29,8 @@ function generar_articles($page = 1, $articlesPerPagina = 3, $sort = 'ID', $dir 
         $stmt = $connexio->prepare($query);
         $stmt->bindValue(':limit', (int)$articlesPerPagina, PDO::PARAM_INT);
         $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
-        if (is_logged_in()) {
-            $stmt->bindValue(':owner_id', $_SESSION['user_id'], PDO::PARAM_INT);
+        if ($is_logged_in && $user_id) {
+            $stmt->bindValue(':owner_id', $user_id, PDO::PARAM_INT);
         }
 
         $stmt->execute();
@@ -50,14 +50,15 @@ function generar_articles($page = 1, $articlesPerPagina = 3, $sort = 'ID', $dir 
 /**
  * generar_paginacio
  * Genera els enllaços de paginacio (Anterior / Numeros / Seguent)
+ * paràmetres: $currentPage (int), $articlesPerPagina (int), $sort (string), $dir (string), $is_logged_in (bool), $user_id (int|null)
  */
-function generar_paginacio($currentPage = 1, $articlesPerPagina = 3, $sort = 'ID', $dir = 'ASC') {
+function generar_paginacio($currentPage = 1, $articlesPerPagina = 3, $sort = 'ID', $dir = 'ASC', $is_logged_in = false, $user_id = null) {
     global $connexio;
     try {
-        if (is_logged_in()) {
+        if ($is_logged_in && $user_id) {
             $query = "SELECT COUNT(*) AS total FROM coches WHERE owner_id = :owner_id";
             $stmt = $connexio->prepare($query);
-            $stmt->bindValue(':owner_id', $_SESSION['user_id'], PDO::PARAM_INT);
+            $stmt->bindValue(':owner_id', $user_id, PDO::PARAM_INT);
             $stmt->execute();
         } else {
             $query = "SELECT COUNT(*) AS total FROM coches";
@@ -91,15 +92,16 @@ function generar_paginacio($currentPage = 1, $articlesPerPagina = 3, $sort = 'ID
 
 /**
  * obtenir_total_pagines
+ * paràmetres: $articlesPerPagina (int), $is_logged_in (bool), $user_id (int|null)
  */
-function obtenir_total_pagines($articlesPerPagina = 3) {
+function obtenir_total_pagines($articlesPerPagina = 3, $is_logged_in = false, $user_id = null) {
     global $connexio;
 
     try {
-        if (is_logged_in()) {
+        if ($is_logged_in && $user_id) {
             $query = "SELECT COUNT(*) AS total FROM coches WHERE owner_id = :owner_id";
             $stmt = $connexio->prepare($query);
-            $stmt->bindValue(':owner_id', $_SESSION['user_id'], PDO::PARAM_INT);
+            $stmt->bindValue(':owner_id', $user_id, PDO::PARAM_INT);
             $stmt->execute();
         } else {
             $query = "SELECT COUNT(*) AS total FROM coches";
@@ -118,19 +120,16 @@ function obtenir_total_pagines($articlesPerPagina = 3) {
 /**
  * listar_tots_articles
  * Retorna tots els articles (filtrats per usuari si cal). S'utilitza per carregar totes les dades al client.
+ * paràmetres: $onlyOwner (bool), $user_id (int|null)
  */
-function listar_tots_articles($onlyOwner = null) {
+function listar_tots_articles($onlyOwner = false, $user_id = null) {
     global $connexio;
 
     try {
-        if ($onlyOwner === null) {
-            $onlyOwner = is_logged_in();
-        }
-
-        if ($onlyOwner && is_logged_in()) {
+        if ($onlyOwner && $user_id) {
             $query = "SELECT ID, marca, model, ruta_img FROM coches WHERE owner_id = :owner_id ORDER BY ID ASC";
             $stmt = $connexio->prepare($query);
-            $stmt->bindValue(':owner_id', $_SESSION['user_id'], PDO::PARAM_INT);
+            $stmt->bindValue(':owner_id', $user_id, PDO::PARAM_INT);
             $stmt->execute();
         } else {
             $query = "SELECT ID, marca, model, ruta_img FROM coches ORDER BY ID ASC";

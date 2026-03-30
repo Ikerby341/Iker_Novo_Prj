@@ -15,7 +15,7 @@ function obtenir_pagina_actual() {
         if (is_numeric($raw)) {
             $val = (int)$raw;
             $perPage = obtenir_per_pagina();
-            $totalPages = obtenir_total_pagines($perPage);
+            $totalPages = obtenir_total_pagines($perPage, is_logged_in(), is_logged_in() ? $_SESSION['user_id'] : null);
             if ($val > 0 && $val <= $totalPages) {
                 return $val;
             }
@@ -65,7 +65,7 @@ function validar_pagina_solicitada() {
 
     $val = (int)$raw;
     $perPage = obtenir_per_pagina();
-    $totalPages = obtenir_total_pagines($perPage);
+    $totalPages = obtenir_total_pagines($perPage, is_logged_in(), is_logged_in() ? $_SESSION['user_id'] : null);
     if ($val < 1 || $val > $totalPages) {
         $params = $_GET;
         $params['page'] = 1;
