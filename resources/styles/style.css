@@ -1,3 +1,23 @@
+/* Per fer que el botó de logout tingui el mateix estil que els enllaços del menú */
+.signin-dropdown .logout-link {
+  padding: 8px 14px;
+  color: #14213d;
+  text-decoration: none;
+  display: block;
+  background: none;
+  border: none;
+  width: 100%;
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-radius: 0;
+}
+
+.signin-dropdown .logout-link:hover,
+.signin-dropdown .logout-link:focus {
+  background: #f1f5ff;
+  outline: none;
+}
 * {
   margin: 0;
   padding: 0;

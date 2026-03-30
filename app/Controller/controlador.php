@@ -25,10 +25,12 @@ include_once __DIR__ .'/users_controller.php';
 // Inicialitzar la sessió
 initialize_session();
 
-// Processem petició de tancament de sessió si s'indica a la query string
-if (isset($_GET['logout']) && ($_GET['logout'] === '1' || $_GET['logout'] === 1)) {
-    logout_user((defined('BASE_URL') ? BASE_URL : '/'));
-    exit;
+// Processem petició de tancament de sessió només via POST amb token CSRF
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['logout']) && isset($_POST['csrf_token'])) {
+    if (isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        logout_user((defined('BASE_URL') ? BASE_URL : '/'));
+        exit;
+    }
 }
 
 ?>

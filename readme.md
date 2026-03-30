@@ -138,3 +138,11 @@ Correccions PROJECTE FASE 3
 - **Problema identificat**: Si dues pestanyes obren la web alhora i restauren la sessió amb "remember me", la primera canvia el token i la segona troba el token antic, resultant en un error de restauració.
 - **Solució**: Permetre múltiples tokens per usuari. En comptes de guardar un únic token a la base de dades, es crea una taula de tokens (amb usuari_id, token, data de creació i expiració). Cada login amb "remember me" genera un nou token i s'afegeix a la llista. Així, cada pestanya/dispositiu pot tenir el seu token vàlid independentment, evitant conflictes i millorant la seguretat i experiència d'usuari.
 - **Nota**: Simplement sería fer aixó però ara mateix si em poso a fer aixó hauria de canviar l'estructura de la BBDD i moltes línies del meu codi.
+
+### 11. Logout via GET vulnerable a CSRF
+- **Problema identificat**: El logout es feia via GET (`index.php?logout=1`), cosa que permetia a un atacant forçar el logout d'un usuari amb una simple imatge (`<img src="index.php?logout=1">`). Això era una vulnerabilitat CSRF.
+- **Solució implementada**: Ara el logout només es pot fer via POST i està protegit amb un token CSRF. Així només es pot executar des d'un formulari legítim de la pròpia web, evitant atacs externs.
+
+### 12. Autenticació social (OAuth) i contrasenya
+- **Pràctica habitual**: Moltes webs famoses (Discord, Twitter, Microsoft, etc.) permeten crear un compte amb OAuth (Google, Facebook, etc.) i, posteriorment, afegir una contrasenya des de la configuració del compte. Això permet iniciar sessió tant amb OAuth com amb email/contrasenya, però només si l'usuari ha establert una contrasenya manualment després del registre social.
+- **Com està implementat aquí**: En aquest projecte, si un usuari es registra amb OAuth (ex: GitHub o Discord), el compte es crea sense contrasenya. Si després vol iniciar sessió amb email/contrasenya, primer ha d'establir una contrasenya (per exemple, mitjançant la funcionalitat de "recuperar contrasenya" o des de la configuració del perfil). Això segueix la pràctica habitual de grans plataformes i evita conflictes d'autenticació.

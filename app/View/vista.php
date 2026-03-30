@@ -33,7 +33,11 @@
                                 <?php endif; ?>
                                 <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/editprofile.php">Editar perfil</a>
                                 <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>app/View/changepassword.php">Canviar contrasenya</a>
-                                <a href="?logout=1">Tancar sessió</a>
+                                <form method="post" action="" style="display:inline;">
+                                    <input type="hidden" name="logout" value="1">
+                                    <input type="hidden" name="csrf_token" value="<?php if (!isset($_SESSION['csrf_token'])) { $_SESSION['csrf_token'] = bin2hex(random_bytes(32)); } echo $_SESSION['csrf_token']; ?>">
+                                    <button type="submit" class="logout-link" tabindex="0">Tancar sessió</button>
+                                </form>
                             </div>
                         </div>
                     <?php else: ?>
