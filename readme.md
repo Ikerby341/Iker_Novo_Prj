@@ -42,7 +42,7 @@ Funcionalitats principals
 
 - Gestió de rutes
   - El projecte utilitza una constant `BASE_URL` per construir enllaços i rutes dins de les vistes i includes. Això evita rutes absolutes que depenguin d'una màquina o d'una estructura concreta de carpetes.
-  - Per què s'ha creat: perquè l'aplicació funcioni correctament des de qualsevol màquina (localhost, un directori dins d'un servidor, o un entorn amb domini propi) sense haver de canviar manualment tots els enllaços de les vistes (Vaig haver d'afegir-ho ja que des de l'ordinador de casa no funcionaba i vaig veure que sense això depenia molt de que les rutes siguin les mateixes que les del meu portatil i això no ha de ser així).
+  - Per què s'ha creat: perquè l'aplicació funcioni correctament des de qualsevol màquina (localhost, un directori dins d'un servidor, o un entorn amb domini propi) sense haver de canviar manualment tots els enllaços de les vistes (Vaig haver d'afegir-ho ja que des de l'ordinador de casa no funcionaba i vaig veure que sense això depenguin molt de que les rutes siguin les mateixes que les del meu portatil i això no ha de ser així).
 
 Novetats recents
 ----------------
@@ -124,3 +124,8 @@ Correccions PROJECTE FASE 3
 - **Error identificat pel professor**: La clau secreta de reCAPTCHA estava exposada en `config/recaptcha.php`, un fitxer que va a GitHub, mentre que les credencials OAuth estaven correctament al `.env`.
 - **Correcció implementada**: S'ha eliminat `recaptcha.php` i mogut la clau a `.env` com `RECAPTCHA_SECRET`. S'han actualitzat `captcha_controller.php` i `controlador.php` per utilitzar `getenv('RECAPTCHA_SECRET')` en comptes de la constant definida. Això evita exposar secrets al repositori.
 - **Nota**: Aixó va ser alguna confusió meva, les claus secretes haurien d'estar sempre al `.env` per seguretat.
+
+### 8. Rutes hardcoded en oauth_callback.php
+- **Problema identificat pel professor**: Les redireccions a `oauth_callback.php` utilitzen rutes absolutes hardcoded (`/Practiques/Backend/Iker_Novo_Prj/app/View/...`) en comptes d'utilitzar `BASE_URL`, cosa que fa que no funcioni en altres màquines.
+- **Correcció implementada**: S'han substituït les rutes hardcoded per `BASE_URL . 'app/View/...'`, amb fallback si `BASE_URL` no està definit. Ara les redireccions són portables.
+- **Nota**: Aquest era un error meu; havia de fer servir `BASE_URL` consistentment, però vaig tenir problemes inicials i vaig deixar les rutes hardcoded. Ara està corregit.

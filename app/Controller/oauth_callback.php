@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/mailer.php'; // Carrega .env
 require_once __DIR__ . '/../Model/users_model.php';
 require_once __DIR__ . '/auth_controller.php'; // Per a les funcions d'inici de sessió
@@ -70,7 +71,7 @@ if (isset($_GET['code']) && isset($_GET['state'])) {
             if ($user) {
                     // Inici de sessió
                 login_user_oauth($user['id']);
-                header('Location: /Practiques/Backend/Iker_Novo_Prj/app/View/vista.php');
+                header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/vista.php' : '/app/View/vista.php'));
                 exit;
             } else {
                 // Registre: redirigir al registre amb les dades de Discord
@@ -80,7 +81,7 @@ if (isset($_GET['code']) && isset($_GET['state'])) {
                     'username' => $discord_username,
                     'email' => $email
                 ];
-                header('Location: /Practiques/Backend/Iker_Novo_Prj/app/View/register_discord.php');
+                header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/register_discord.php' : '/app/View/register_discord.php'));
                 exit;
             }
         }
@@ -88,6 +89,6 @@ if (isset($_GET['code']) && isset($_GET['state'])) {
 }
 
 // Error
-header('Location: /Practiques/Backend/Iker_Novo_Prj/app/View/login.php?error=oauth_failed');
+header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/login.php?error=oauth_failed' : '/app/View/login.php?error=oauth_failed'));
 exit;
 ?>
