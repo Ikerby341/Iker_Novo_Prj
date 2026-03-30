@@ -11,11 +11,12 @@
  * Retorna true si la verificació és correcta.
  */
 function verify_recaptcha($token) {
-    if (!defined('RECAPTCHA_SECRET') || empty(RECAPTCHA_SECRET)) return false;
+    $secret = getenv('RECAPTCHA_SECRET');
+    if (empty($secret)) return false;
 
     $url = 'https://www.google.com/recaptcha/api/siteverify';
     $data = http_build_query([
-        'secret' => RECAPTCHA_SECRET,
+        'secret' => $secret,
         'response' => $token,
         'remoteip' => $_SERVER['REMOTE_ADDR'] ?? null
     ]);

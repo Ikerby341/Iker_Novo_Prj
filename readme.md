@@ -110,7 +110,17 @@ Correccions PROJECTE FASE 3
 ### 4. Verificació de funcions OAuth
 - **Comentari del professor**: Es va qüestionar si `login_user_oauth()` està definida, ja que s'utilitza a `github_callback.php` i `oauth_callback.php` però no apareix als fitxers adjunts.
 - **Verificació**: La funció està correctament definida a `auth_controller.php` (línia 166) i és inclosa als fitxers que l'utilitzen amb `require_once`. No hi ha cap error, pot ser que quan ho vas mirar tinguesis una versió antiga del codi.
+
 ### 5. Protecció CSRF en OAuth Discord
 - **Problema identificat**: El flux OAuth manual de Discord no validava el paràmetre `state`, exposant a atacs CSRF on un atacant podria interceptar el `code` i fer peticions falses al callback.
 - **Solució implementada**: S'ha afegit generació i validació de `state` al flux de Discord. Als formularis `login.php` i `register.php`, es genera un `state` aleatori, s'emmagatzema a `$_SESSION['oauth_state']`, i s'envia amb la URL d'autorització. Al callback (`oauth_callback.php`), es valida que el `state` rebut coincideixi amb el de la sessió abans de processar el `code`. Si no coincideix, es redirigeix amb error.
 - **Comparativa amb Hybridauth**: Hybridauth gestiona `state` automàticament, mentre que la implementació manual requeria aquest afegit per igualar la seguretat.
+
+### 6. Gestió de registres incomplets en OAuth Discord
+- **Comentari del professor**: Es va qüestionar si tancar `register_discord.php` a mitges deixa usuaris a mitges a la base de dades.
+- **Explicació**: No, el registre és atòmic. Les dades de Discord s'emmagatzemen temporalment a la sessió (`$_SESSION['discord_data']`), però l'usuari només es crea a la BD quan es completa el formulari amb èxit. Si l'usuari tanca la finestra, no es crea res persistent, evitant dades orfes.
+
+### 7. Exposició de clau secreta de reCAPTCHA
+- **Error identificat pel professor**: La clau secreta de reCAPTCHA estava exposada en `config/recaptcha.php`, un fitxer que va a GitHub, mentre que les credencials OAuth estaven correctament al `.env`.
+- **Correcció implementada**: S'ha eliminat `recaptcha.php` i mogut la clau a `.env` com `RECAPTCHA_SECRET`. S'han actualitzat `captcha_controller.php` i `controlador.php` per utilitzar `getenv('RECAPTCHA_SECRET')` en comptes de la constant definida. Això evita exposar secrets al repositori.
+- **Nota**: Aixó va ser alguna confusió meva, les claus secretes haurien d'estar sempre al `.env` per seguretat.

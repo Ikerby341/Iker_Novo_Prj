@@ -14,11 +14,6 @@ if (file_exists(__DIR__ . '/../../config/app.php')) {
 include_once __DIR__ .'/../Model/users_model.php';
 include_once __DIR__ .'/../Model/articles_model.php';
 
-// Incluïm la configuració de reCAPTCHA
-if (file_exists(__DIR__ . '/../../config/recaptcha.php')) {
-    include_once __DIR__ . '/../../config/recaptcha.php';
-}
-
 // Incluïm els controllers específics
 include_once __DIR__ .'/captcha_controller.php';
 include_once __DIR__ .'/session_controller.php';
