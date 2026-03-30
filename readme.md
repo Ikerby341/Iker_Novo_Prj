@@ -129,3 +129,12 @@ Correccions PROJECTE FASE 3
 - **Problema identificat pel professor**: Les redireccions a `oauth_callback.php` utilitzen rutes absolutes hardcoded (`/Practiques/Backend/Iker_Novo_Prj/app/View/...`) en comptes d'utilitzar `BASE_URL`, cosa que fa que no funcioni en altres màquines.
 - **Correcció implementada**: S'han substituït les rutes hardcoded per `BASE_URL . 'app/View/...'`, amb fallback si `BASE_URL` no està definit. Ara les redireccions són portables.
 - **Nota**: Aquest era un error meu; havia de fer servir `BASE_URL` consistentment, però vaig tenir problemes inicials i vaig deixar les rutes hardcoded. Ara està corregit.
+
+### 9. Simplificació creació d'usuaris OAuth GitHub
+- **Problema identificat**: El codi de `github_callback.php` intentava crear un usuari OAuth de GitHub amb fins a tres intents consecutius, provant diferents combinacions de camps i columnes. Aquesta estratègia amagava problemes d'esquema i dificultava la depuració.
+- **Solució implementada**: S'ha revisat l'estructura de la taula `usuarios` (veure `usuarios.sql`) i ara la creació d'usuaris OAuth GitHub es fa amb una sola inserció clara, assegurant els camps obligatoris (`username`, `email`, `password` - es deixa buida per OAuth, `github_id`). S'ha eliminat la lògica de múltiples fallbacks i s'ha simplificat el procés, millorant la robustesa i mantenibilitat del codi.
+
+### 10. Gestió de múltiples tokens "remember me"
+- **Problema identificat**: Si dues pestanyes obren la web alhora i restauren la sessió amb "remember me", la primera canvia el token i la segona troba el token antic, resultant en un error de restauració.
+- **Solució**: Permetre múltiples tokens per usuari. En comptes de guardar un únic token a la base de dades, es crea una taula de tokens (amb usuari_id, token, data de creació i expiració). Cada login amb "remember me" genera un nou token i s'afegeix a la llista. Així, cada pestanya/dispositiu pot tenir el seu token vàlid independentment, evitant conflictes i millorant la seguretat i experiència d'usuari.
+- **Nota**: Simplement sería fer aixó però ara mateix si em poso a fer aixó hauria de canviar l'estructura de la BBDD i moltes línies del meu codi.

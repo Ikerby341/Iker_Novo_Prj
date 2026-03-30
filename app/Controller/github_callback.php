@@ -76,54 +76,18 @@ if ($user) {
         $i++;
     }
 
-    // Crear usuario con función específica (si existe) o inserción directa
-    $created = false;
-    if (function_exists('create_user_oauth_github')) {
-        $created = create_user_oauth_github($finalUsername, $email, $githubId, 'github');
-        if ($created) {
-            // obtener id del nuevo usuario
-            global $connexio;
-            $stmt = $connexio->prepare('SELECT * FROM usuarios WHERE github_id = :g LIMIT 1');
-            $stmt->execute([':g' => $githubId]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        }
-    } else {
-        // Intentar inserción directa (tabla debe tener columnas github_id, hybridauth_provider)
-        try {
-            global $connexio;
-            $stmt = $connexio->prepare('INSERT INTO usuarios (username, email, github_id, hybridauth_provider) VALUES (:u, :e, :g, :p)');
-            $created = $stmt->execute([':u' => $finalUsername, ':e' => $email, ':g' => $githubId, ':p' => 'github']);
-            if ($created) {
-                $id = $connexio->lastInsertId();
-                $user = get_user_by_id($id);
-            }
-        } catch (Exception $e) {
-            error_log('DB create github user error: ' . $e->getMessage());
-            $created = false;
-        }
-    }
-
-    if ($user) {
-        login_user_oauth($user['id']);
-        header('Location: ../app/View/vista.php');
-        exit;
-    }
-
-    // Alternativa: intentar crear usuari mínim sense columnes específiques
+    // Crear usuari OAuth GitHub segons l'esquema actual: username, email, github_id, password (obligatori)
     try {
         global $connexio;
-        $stmt = $connexio->prepare('INSERT INTO usuarios (username, email) VALUES (:u, :e)');
-        $ok = $stmt->execute([':u' => $finalUsername, ':e' => $email]);
+        $stmt = $connexio->prepare('INSERT INTO usuarios (username, email, password, github_id) VALUES (:u, :e, :p, :g)');
+        $ok = $stmt->execute([
+            ':u' => $finalUsername,
+            ':e' => $email,
+            ':p' => '', // password buida per usuaris OAuth
+            ':g' => $githubId
+        ]);
         if ($ok) {
             $id = $connexio->lastInsertId();
-            // Intentar actualizar github_id/hybridauth_provider si existen
-            try {
-                $stmt = $connexio->prepare('UPDATE usuarios SET github_id = :g, hybridauth_provider = :p WHERE id = :id');
-                $stmt->execute([':g' => $githubId, ':p' => 'github', ':id' => $id]);
-            } catch (Exception $e) {
-                // Columnas no presentes o fallo: ignorar
-                error_log('Github column update failed (likely missing columns): ' . $e->getMessage());
-            }
             $user = get_user_by_id($id);
             if ($user) {
                 login_user_oauth($user['id']);
@@ -132,9 +96,8 @@ if ($user) {
             }
         }
     } catch (Exception $e) {
-        error_log('Fallback create user error: ' . $e->getMessage());
+        error_log('DB create github user error: ' . $e->getMessage());
     }
-
     header('Location: ../app/View/login.php?error=oauth_create_failed');
     exit;
 
