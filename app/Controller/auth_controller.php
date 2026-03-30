@@ -366,4 +366,20 @@ function process_forgot_password($email) {
     }
 }
 
+/**
+ * validate_reset_token_controller
+ * Controlador per validar el token de reset de contrasenya
+ */
+function validate_reset_token_controller($token) {
+    return validate_reset_token($token);
+}
+
+/**
+ * reset_password_controller
+ * Controlador per restablir la contrasenya utilitzant el token
+ */
+function reset_password_controller($token, $new_password) {
+    return reset_user_password($token, $new_password);
+}
+
 ?>

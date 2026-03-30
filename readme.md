@@ -150,3 +150,11 @@ Correccions PROJECTE FASE 3
 ### 13. Separació de capes: model crida funcions del controlador
 - **Problema identificat**: El model `articles_model.php` cridava funcions del controlador..
 - **Solució implementada**: S'han modificat les funcions del model (`generar_articles`, `generar_paginacio`, `obtenir_total_pagines`, `listar_tots_articles`) per rebre paràmetres (`$is_logged_in`, `$user_id`) en comptes de cridar funcions del controlador. Ara el controlador passa aquests valors quan crida les funcions del model, mantenint la separació de capes.
+
+### 14. Consultes SQL directes a la vista resetpassword.php
+- **Problema identificat**: La vista `resetpassword.php` feia consultes SQL directes (validar token i actualitzar contrasenya), saltant-se el model i el controlador, violant l'arquitectura MVC.
+- **Solució implementada**: S'han mogut les consultes SQL al model `users_model.php` creant les funcions `validate_reset_token()` i `reset_user_password()`. S'han creat funcions del controlador `validate_reset_token_controller()` i `reset_password_controller()` a `auth_controller.php` que criden al model. La vista ara crida al controlador, mantenint la separació de capes MVC completa.
+
+### 15. Processament de formularis POST i redireccions directes a les vistes admin.php i edit_user.php
+- **Problema identificat**: Les vistes `admin.php` i `edit_user.php` processaven directament els formularis POST, cridaven funcions del model (`get_all_users()`) i feien redireccions amb `header()`.
+- **Solució implementada**: S'han creat funcions del controlador `admin_page_controller()` i `edit_user_page_controller($user_id)` a `crud_controller.php` que gestionen tot el processament de POST, les redireccions i retornen les dades necessàries per a les vistes. Les vistes ara només criden aquestes funcions del controlador i mostren les dades retornades, mantenint la separació de capes MVC.

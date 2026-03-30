@@ -360,4 +360,87 @@
             return ['success' => false, 'message' => 'Error a l\'esborrar l\'usuari o falta de permisos.'];
         }
     }
+
+    /**
+     * Controlador per la pàgina admin.php
+     * Processa accions POST i retorna dades per la vista
+     */
+    function admin_page_controller() {
+        // Processar accions POST si és admin
+        if (is_logged_in() && is_admin() && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            $action = $_POST['action'] ?? '';
+            $user_id = (int)($_POST['user_id'] ?? 0);
+
+            if ($action === 'delete' && $user_id > 0) {
+                // Cridem a la funció del controlador
+                $result = process_delete_user_admin($user_id);
+                $_SESSION['message'] = $result['message'];
+                if (!$result['success']) {
+                    $_SESSION['error'] = $result['message'];
+                    unset($_SESSION['message']);
+                }
+            }
+
+            // Redirigir para evitar reenvío de formulario
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/admin.php' : '/app/View/admin.php'));
+            exit;
+        }
+
+        // Retornar dades per la vista
+        $users = get_all_users();
+        $current_user_id = $_SESSION['user_id'] ?? null;
+        $filtered_users = array_filter($users, function($user) use ($current_user_id) {
+            return $user['id'] != $current_user_id;
+        });
+
+        return [
+            'users' => $filtered_users,
+            'is_admin' => is_admin()
+        ];
+    }
+
+    /**
+     * Controlador per la pàgina edit_user.php
+     * Processa accions POST i retorna dades per la vista
+     */
+    function edit_user_page_controller($user_id) {
+        $user_id = (int)$user_id;
+        if (!$user_id) {
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/admin.php' : '/app/View/admin.php'));
+            exit;
+        }
+
+        // Obtenir dades del usuari
+        $users = get_all_users();
+        $user = null;
+        foreach ($users as $u) {
+            if ($u['id'] == $user_id) {
+                $user = $u;
+                break;
+            }
+        }
+        if (!$user) {
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/admin.php' : '/app/View/admin.php'));
+            exit;
+        }
+
+        // Procesar POST
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $newName = trim($_POST['username'] ?? '');
+            $newEmail = trim($_POST['email'] ?? '');
+            $newAdmin = (int)($_POST['admin'] ?? $user['admin']);
+
+            // Cridem a la funció del controlador
+            $result = process_edit_user_admin($user_id, $newName, $newEmail, $newAdmin);
+
+            // Guardar missatge en sessió i redirigir a admin.php
+            $_SESSION['message'] = implode(' ', $result['messages']);
+            header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/admin.php' : '/app/View/admin.php'));
+            exit;
+        }
+
+        return [
+            'user' => $user
+        ];
+    }
 ?>

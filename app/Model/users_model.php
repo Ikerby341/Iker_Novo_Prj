@@ -264,4 +264,35 @@ function update_user_github_link($userId, $github_id) {
     }
 }
 
+/**
+ * validate_reset_token
+ * Valida si un token de reset és vàlid i retorna l'ID de l'usuari si ho és
+ */
+function validate_reset_token($token) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('SELECT id FROM usuarios WHERE reset_token = ? AND reset_token_expires > NOW() LIMIT 1');
+        $stmt->execute([$token]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user ? $user['id'] : false;
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * reset_user_password
+ * Restableix la contrasenya d'un usuari utilitzant el token de reset
+ */
+function reset_user_password($token, $new_password) {
+    global $connexio;
+    try {
+        $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
+        $stmt = $connexio->prepare('UPDATE usuarios SET password = ?, reset_token = NULL, reset_token_expires = NULL WHERE reset_token = ? LIMIT 1');
+        return $stmt->execute([$hashed_password, $token]);
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
 ?>

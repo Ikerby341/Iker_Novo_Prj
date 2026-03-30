@@ -7,25 +7,8 @@
     // Validar i possiblement redirigir si la pagina sol.licitada no existeix
     validar_pagina_solicitada();
 
-    // Processar accions POST si és admin
-    if (is_logged_in() && is_admin() && $_SERVER['REQUEST_METHOD'] === 'POST') {
-        $action = $_POST['action'] ?? '';
-        $user_id = (int)($_POST['user_id'] ?? 0);
-
-        if ($action === 'delete' && $user_id > 0) {
-            // Cridem a la funció del controlador
-            $result = process_delete_user_admin($user_id);
-            $_SESSION['message'] = $result['message'];
-            if (!$result['success']) {
-                $_SESSION['error'] = $result['message'];
-                unset($_SESSION['message']);
-            }
-        }
-
-        // Redirigir para evitar reenvío de formulario
-        header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/admin.php' : '/app/View/admin.php'));
-        exit;
-    }
+    // Obtenir dades de la pàgina admin
+    $admin_data = admin_page_controller();
 ?>
 <html lang="es">
 <head>
@@ -40,7 +23,7 @@
             <h1 style="color: #ffffff;"><a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>">GUARCAR</a></h1>
         </div>
     </header>
-    <?php if (is_admin()): ?>
+    <?php if ($admin_data['is_admin']): ?>
         <div class="site-content">
         <!-- Títol principal de la pàgina -->
         <h1 style="text-align: center;">Gestionar usuaris</h1>
@@ -63,12 +46,7 @@
                     </thead>
                     <tbody>
                         <?php
-                        $users = get_all_users();
-                        $current_user_id = $_SESSION['user_id'] ?? null;
-                        $filtered_users = array_filter($users, function($user) use ($current_user_id) {
-                            return $user['id'] != $current_user_id;
-                        });
-                        foreach ($filtered_users as $user): ?>
+                        foreach ($admin_data['users'] as $user): ?>
                             <tr>
                                 <td><?php echo htmlspecialchars($user['username']); ?></td>
                                 <td><?php echo htmlspecialchars($user['email']); ?></td>

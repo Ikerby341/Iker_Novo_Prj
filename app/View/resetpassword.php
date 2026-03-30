@@ -11,22 +11,11 @@ $token_valid = false;
 
 // Validar el token
 if (!empty($token)) {
-    require_once __DIR__ . '/../../config/db-connection.php';
-    global $connexio;
-    
-    try {
-        $stmt = $connexio->prepare('SELECT id FROM usuarios WHERE reset_token = ? AND reset_token_expires > NOW() LIMIT 1');
-        $stmt->execute([$token]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if ($user) {
-            $token_valid = true;
-        } else {
-            $error = 'L\'enllaç de recuperació és invàlid o ha caducat.';
-        }
-    } catch (PDOException $e) {
-        $error = 'Error en validar el token.';
-        error_log('Database Error: ' . $e->getMessage());
+    $user_id = validate_reset_token_controller($token);
+    if ($user_id) {
+        $token_valid = true;
+    } else {
+        $error = 'L\'enllaç de recuperació és invàlid o ha caducat.';
     }
 }
 
@@ -43,16 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $token_valid) {
         $error = 'Les contrasenyes no coincideixen.';
     } else {
         // Actualitzar la contrasenya
-        try {
-            $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
-            $update_stmt = $connexio->prepare('UPDATE usuarios SET password = ?, reset_token = NULL, reset_token_expires = NULL WHERE reset_token = ? LIMIT 1');
-            $update_stmt->execute([$hashed_password, $token]);
-            
+        if (reset_password_controller($token, $new_password)) {
             $message = 'Contrasenya restablerta correctament! Ja pots iniciar sessió amb la teva nova contrasenya.';
             $token_valid = false;
-        } catch (PDOException $e) {
+        } else {
             $error = 'Error en restablir la contrasenya.';
-            error_log('Database Error: ' . $e->getMessage());
         }
     }
 }

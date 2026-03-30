@@ -11,39 +11,10 @@
 
     // Obtener user_id de GET
     $user_id = (int)($_GET['user_id'] ?? 0);
-    if (!$user_id) {
-        header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/admin.php' : '/app/View/admin.php'));
-        exit;
-    }
 
-    // Obtener datos del usuario
-    $user = null;
-    $users = get_all_users();
-    foreach ($users as $u) {
-        if ($u['id'] == $user_id) {
-            $user = $u;
-            break;
-        }
-    }
-    if (!$user) {
-        header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/admin.php' : '/app/View/admin.php'));
-        exit;
-    }
-
-    // Procesar POST
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $newName = trim($_POST['username'] ?? '');
-        $newEmail = trim($_POST['email'] ?? '');
-        $newAdmin = (int)($_POST['admin'] ?? $user['admin']);
-
-        // Cridem a la funció del controlador
-        $result = process_edit_user_admin($user_id, $newName, $newEmail, $newAdmin);
-        
-        // Guardar missatge en sessió i redirigir a admin.php
-        $_SESSION['message'] = implode(' ', $result['messages']);
-        header('Location: ' . (defined('BASE_URL') ? BASE_URL . 'app/View/admin.php' : '/app/View/admin.php'));
-        exit;
-    }
+    // Obtenir dades de la pàgina edit_user
+    $edit_data = edit_user_page_controller($user_id);
+    $user = $edit_data['user'];
 ?>
 <html lang="es">
 <head>
