@@ -126,16 +126,6 @@ function login_user($username, $password, $remember = false) {
         if (password_verify($password, $stored)) {
             $verified = true;
         }
-    } else {
-        // Si no sembla un hash (pot ser text pla a la BD), fem comparació directa
-        if ($password === $stored) {
-            $verified = true;
-            // Rehash i actualitza la BD perquè la contrasenya ja no quedi en text pla
-            $newHash = password_hash($password, PASSWORD_BCRYPT);
-            if ($newHash !== false) {
-                update_user_password_hash($user['id'], $newHash);
-            }
-        }
     }
 
     if (!$verified) {

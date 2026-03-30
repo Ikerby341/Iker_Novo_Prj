@@ -350,10 +350,14 @@
             return ['success' => false, 'message' => 'ID d\'usuari invàlida'];
         }
 
-        if (delete_user($user_id)) {
+        // Obtenir dades de l'usuari actual (assumeix que ja s'ha verificat que és admin)
+        $current_user_id = $_SESSION['user_id'] ?? 0;
+        $is_admin = is_admin();
+
+        if (delete_user($user_id, $current_user_id, $is_admin)) {
             return ['success' => true, 'message' => 'Usuari esborrat correctament.'];
         } else {
-            return ['success' => false, 'message' => 'Error a l\'esborrar l\'usuari.'];
+            return ['success' => false, 'message' => 'Error a l\'esborrar l\'usuari o falta de permisos.'];
         }
     }
 ?>

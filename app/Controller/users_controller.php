@@ -27,10 +27,10 @@ if (__FILE__ === $_SERVER['SCRIPT_FILENAME']) {
 
         if ($action === 'delete' && $user_id > 0) {
             // Esborrar usuari
-            if (delete_user($user_id)) {
+            if (delete_user($user_id, $_SESSION['user_id'], is_admin())) {
                 $_SESSION['message'] = 'Usuari eliminat correctament.';
             } else {
-                $_SESSION['error'] = 'Error a l\'esborrar l\'usuari.';
+                $_SESSION['error'] = 'Error a l\'esborrar l\'usuari o falta de permisos.';
             }
         } elseif ($action === 'toggle_admin' && $user_id > 0) {
             // Cambiar estado admin

@@ -128,9 +128,21 @@ function modificarEmailInDB($id, $newEmail) {
 
 /**
  * delete_user
- * Elimina un usuario por ID
+ * Elimina un usuario por ID, amb comprovacions de seguretat
+ * @param int $id ID de l'usuari a eliminar
+ * @param int $current_user_id ID de l'usuari que fa la petició
+ * @param bool $is_admin Si l'usuari que fa la petició és admin
+ * @return bool True si s'ha eliminat, false en cas d'error o falta de permisos
  */
-function delete_user($id) {
+function delete_user($id, $current_user_id, $is_admin) {
+    // Comprovacions de seguretat
+    if (!$is_admin) {
+        return false; // Només admins poden eliminar
+    }
+    if ($id == $current_user_id) {
+        return false; // No es pot eliminar a si mateix
+    }
+
     global $connexio;
     try {
         $stmt = $connexio->prepare('DELETE FROM usuarios WHERE id = :id');

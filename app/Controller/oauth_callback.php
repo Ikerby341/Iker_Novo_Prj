@@ -4,12 +4,24 @@ require_once __DIR__ . '/../Model/users_model.php';
 require_once __DIR__ . '/auth_controller.php'; // Per a les funcions d'inici de sessió
 require_once 'session_controller.php'; // Assumeix gestió de sessions
 
+// Iniciar sessió per validar state
+initialize_session();
+
 $client_id = getenv('DISCORD_CLIENT_ID');
 $client_secret = getenv('DISCORD_CLIENT_SECRET');
 $redirect_uri = getenv('DISCORD_REDIRECT_URI');
 
-if (isset($_GET['code'])) {
+if (isset($_GET['code']) && isset($_GET['state'])) {
     $code = $_GET['code'];
+    $received_state = $_GET['state'];
+
+    // Validar state per prevenir CSRF
+    if (!isset($_SESSION['oauth_state']) || $received_state !== $_SESSION['oauth_state']) {
+        header('Location: /Practiques/Backend/Iker_Novo_Prj/app/View/login.php?error=invalid_state');
+        exit;
+    }
+    // Netejar state de la sessió
+    unset($_SESSION['oauth_state']);
 
     // Intercanviar codi per token
     $token_url = 'https://discord.com/api/oauth2/token';

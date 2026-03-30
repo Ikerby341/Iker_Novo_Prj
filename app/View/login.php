@@ -15,6 +15,11 @@
         }
     }
 
+    // Iniciar sessió per gestionar state OAuth
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
     // Processar l'inici de sessió si és POST
     $errors = [];
     $oldUser = '';
@@ -122,7 +127,13 @@
                     <a href="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>public/index.php?action=github_login" class="github-btn" aria-label="Inicia sesión con GitHub">
                         <img src="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>public/assets/img/github.webp" alt="GitHub" class="github-icon">
                     </a>
-                    <a href="https://discord.com/api/oauth2/authorize?client_id=<?php echo getenv('DISCORD_CLIENT_ID'); ?>&redirect_uri=<?php echo urlencode(getenv('DISCORD_REDIRECT_URI')); ?>&response_type=code&scope=identify%20email" class="discord-btn" aria-label="Inicia sesión con Discord">
+                    <?php
+                    // Generar state per CSRF protection
+                    $state = bin2hex(random_bytes(16));
+                    $_SESSION['oauth_state'] = $state;
+                    $discord_url = 'https://discord.com/api/oauth2/authorize?client_id=' . getenv('DISCORD_CLIENT_ID') . '&redirect_uri=' . urlencode(getenv('DISCORD_REDIRECT_URI')) . '&response_type=code&scope=identify%20email&state=' . $state;
+                    ?>
+                    <a href="<?php echo $discord_url; ?>" class="discord-btn" aria-label="Inicia sesión con Discord">
                         <img src="<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>public/assets/img/discord.webp" alt="Discord" class="discord-icon">
                     </a>
                 </div>

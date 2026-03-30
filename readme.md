@@ -89,3 +89,28 @@ Credencials Administrador
 -------------------------
 - User: admin
 - Pass: Proba1234.
+
+Correccions PROJECTE FASE 3
+---------------------------
+### 1. Correcció de seguretat en autenticació
+- **Problema identificat**: La funció `login_user` a `auth_controller.php` incloïa una comparació de contrasenyes en text pla per suportar migracions d'usuaris amb contrasenyes antigues no hashejades. Això implicava comparar la contrasenya introduïda (en clar) amb el valor emmagatzemat a la base de dades, creant un risc de seguretat.
+- **Solució implementada**: S'ha eliminat la lògica de comparació en text pla. Ara, només es verifica amb `password_verify()` si el hash és vàlid. Usuaris amb contrasenyes antigues en text pla no podran iniciar sessió i hauran d'utilitzar la funcionalitat de "recuperar contrasenya" per restablir-la de manera segura.
+- **Impacte**: Millora la seguretat eliminant exposició de contrasenyes en clar. Usuaris afectats poden recuperar l'accés via email. Es recomana executar un script de migració separat per rehashejar contrasenyes antigues abans de desplegar en producció.
+
+### 2. Protecció contra eliminació d'usuaris
+- **Funcionament actual**: La protecció contra auto-eliminació i accés no autoritzat està implementada a nivell d'interfície d'usuari (UI). A `admin.php`, la llista d'usuaris filtra l'usuari actual amb `array_filter()` per evitar que un admin es pugui eliminar a si mateix. A més, l'accés a la vista està restringit només a usuaris amb rol admin via `is_admin()`. La funció `delete_user()` del model no té comprovacions internes i depèn dels controladors per validar permisos.
+- **Problema identificat**: Si `delete_user()` es crida directament des d'un altre lloc (per exemple, scripts externs o futures extensions), podria permetre eliminacions no autoritzades. La lògica de seguretat depèn de qui crida la funció, no de la funció en si.
+- **Modificació implementada**: S'han afegit comprovacions internes a `delete_user()` al model. Ara la funció requereix `current_user_id` i `is_admin` com a paràmetres, i verifica que només admins puguin eliminar i que no es pugui eliminar a si mateix.
+
+### 3. Integritat referencial de la base de dades (ON DELETE CASCADE)
+- **Problema identificat**: Les taules relacionades amb `usuarios` no tenien claus forànies amb `ON DELETE CASCADE`, de manera que en eliminar un usuari els seus registres associats quedaven orfes a la base de dades.
+- **Solució implementada**: S'ha afegit una clau forana amb `ON DELETE CASCADE` a la taula de vehicles sobre la columna `owner_id`, referenciant `usuarios(id)`. Ara, quan s'elimina un usuari, tots els seus registres associats s'eliminen automàticament.
+- **Impacte**: Millora la integritat referencial de la base de dades i evita l'acumulació de dades orfes. L'eliminació d'usuaris és ara una operació neta i consistent a nivell de base de dades.
+
+### 4. Verificació de funcions OAuth
+- **Comentari del professor**: Es va qüestionar si `login_user_oauth()` està definida, ja que s'utilitza a `github_callback.php` i `oauth_callback.php` però no apareix als fitxers adjunts.
+- **Verificació**: La funció està correctament definida a `auth_controller.php` (línia 166) i és inclosa als fitxers que l'utilitzen amb `require_once`. No hi ha cap error, pot ser que quan ho vas mirar tinguesis una versió antiga del codi.
+### 5. Protecció CSRF en OAuth Discord
+- **Problema identificat**: El flux OAuth manual de Discord no validava el paràmetre `state`, exposant a atacs CSRF on un atacant podria interceptar el `code` i fer peticions falses al callback.
+- **Solució implementada**: S'ha afegit generació i validació de `state` al flux de Discord. Als formularis `login.php` i `register.php`, es genera un `state` aleatori, s'emmagatzema a `$_SESSION['oauth_state']`, i s'envia amb la URL d'autorització. Al callback (`oauth_callback.php`), es valida que el `state` rebut coincideixi amb el de la sessió abans de processar el `code`. Si no coincideix, es redirigeix amb error.
+- **Comparativa amb Hybridauth**: Hybridauth gestiona `state` automàticament, mentre que la implementació manual requeria aquest afegit per igualar la seguretat.
