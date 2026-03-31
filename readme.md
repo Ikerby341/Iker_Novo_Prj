@@ -52,6 +52,26 @@ Novetats recents
 - Comentaris traduïts: s'han traduït a català diversos comentaris del codi per millorar la coherència de l'idioma dins del projecte.
 - Generació de vehicles aleatoris: s'ha afegit un botó a la pàgina de creació d'articles (`create.php`) que consumeix l'API pública de NHTSA (National Highway Traffic Safety Administration) per obtenir marques i models de vehicles aleatoris. Filtra marques comunes a Espanya (com Audi, Seat, BMW, etc.) per proporcionar dades realistes.
 
+API (`api.php`)
+------------------
+S'ha afegit una API senzilla en `api.php` per consultar dades dels vehicles en format JSON. Aquesta API permet consumir la informació des de clients externs (per exemple, JavaScript o altres aplicacions).
+
+- Format de resposta: JSON  
+- Mètode suportat: GET  
+- CORS habilitat (es permeten peticions externes)  
+
+### Endpoints disponibles
+- `GET /api/vehicles`  
+  Retorna tots els vehicles disponibles.
+
+- `GET /api/users/{id}/vehicles`  
+  Retorna els vehicles associats a un usuari concret.
+
+### Notes
+- Només s’accepten peticions GET (altres mètodes retornen error).  
+- Si l’endpoint no existeix, retorna un error 404.  
+- Internament utilitza les funcions del model (`articles_model.php`) per obtenir les dades.  
+
 Comparativa: OAuth amb Discord (manual) vs Hybridauth amb GitHub
 -------------------------------------------------------------
 - Implementació:

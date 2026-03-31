@@ -1,0 +1,6 @@
+RewriteEngine On
+
+# Redirigeix /api/* cap a public/api.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^api/(.*)$ public/api.php/$1 [QSA,L]
