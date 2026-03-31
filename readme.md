@@ -50,6 +50,7 @@ Novetats recents
 - Integració GitHub amb Hybridauth: s'ha afegit suport per autenticar amb GitHub mitjançant la llibreria Hybridauth i la configuració a `config/hybridauth.php`. La URL de callback per defecte apunta a `public/index.php?action=github_callback` i la variable `GITHUB_REDIRECT_URI` es pot sobreescriure a `.env`.
 - OAuth amb Discord: hi ha un flux OAuth específic implementat manualment per Discord (`app/Controller/oauth_callback.php`) i una vista d'ajust per completar registre amb dades de Discord (`app/View/register_discord.php`).
 - Comentaris traduïts: s'han traduït a català diversos comentaris del codi per millorar la coherència de l'idioma dins del projecte.
+- Generació de vehicles aleatoris: s'ha afegit un botó a la pàgina de creació d'articles (`create.php`) que consumeix l'API pública de NHTSA (National Highway Traffic Safety Administration) per obtenir marques i models de vehicles aleatoris. Filtra marques comunes a Espanya (com Audi, Seat, BMW, etc.) per proporcionar dades realistes.
 
 Comparativa: OAuth amb Discord (manual) vs Hybridauth amb GitHub
 -------------------------------------------------------------
