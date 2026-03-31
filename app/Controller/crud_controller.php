@@ -443,4 +443,12 @@
             'user' => $user
         ];
     }
+
+    /**
+     * Obté dades d'un vehicle aleatori des d'una API externa
+     * Retorna array amb 'marca' i 'model' o false en cas d'error
+     */
+    function get_random_vehicle_data() {
+        return get_random_vehicle();
+    }
 ?>

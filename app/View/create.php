@@ -6,15 +6,26 @@ include_once __DIR__ . '/../Controller/crud_controller.php';
 
 // Inicialitzem la variable que contindrà el missatge de resposta
 $missatge = '';
+$marca_generada = '';
+$model_generat = '';
+
+// Comprovem si s'ha demanat generar vehicle aleatori (GET)
+if (isset($_GET['generate'])) {
+    $vehicle = get_random_vehicle_data();
+    if ($vehicle) {
+        $marca_generada = $vehicle['marca'];
+        $model_generat = $vehicle['model'];
+    }
+}
 
 // Comprovem si s'ha enviat el formulari (mètode POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $titol = $_POST['titol'] ?? '';
-    $cos = $_POST['cos'] ?? '';
-    $image_file = $_FILES['imagen'] ?? null;
+     $titol = $_POST['titol'] ?? '';
+     $cos = $_POST['cos'] ?? '';
+     $image_file = $_FILES['imagen'] ?? null;
 
-    // Cridem a la funció del controlador
-    $missatge = process_create_article($titol, $cos, $image_file);
+     // Cridem a la funció del controlador
+     $missatge = process_create_article($titol, $cos, $image_file);
 }
 ?>
 
@@ -50,10 +61,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <!-- Camp pel títol -->
             <label for="titol">Marca:</label><br>
-            <input type="text" name="titol" id="titol" required><br>
+            <input type="text" name="titol" id="titol" value="<?php echo htmlspecialchars($marca_generada); ?>" required><br>
             <!-- Camp pel cos del missatge -->
             <label for="cos">Model:</label><br>
-            <input type="text" name="cos" id="cos" required><br>
+            <input type="text" name="cos" id="cos" value="<?php echo htmlspecialchars($model_generat); ?>" required><br>
+            <!-- Botó per generar vehicle aleatori -->
+            <button type="button" onclick="window.location.href='?generate=1'" class="principalBox">Generar Vehicle Aleatori 🎲</button><br><br>
             <div class="button-row">
                 <!-- Botó per tornar a la pàgina principal -->
                 <button class="principalBox" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>

@@ -228,4 +228,41 @@ function esborrar($id) {
     }
 }
 
+/**
+ * Obté un vehicle aleatori des d'una API externa
+ * Retorna un array amb 'marca' i 'model' o false en cas d'error
+ */
+function get_random_vehicle() {
+    $marcasJson = @file_get_contents("https://vpic.nhtsa.dot.gov/api/vehicles/getallmakes?format=json");
+    if ($marcasJson === false) {
+        return false;
+    }
+    $marcas = json_decode($marcasJson, true);
+    if ($marcas === null || empty($marcas['Results'])) {
+        return false;
+    }
+
+    $marcasArray = $marcas['Results'];
+    $marcaAleatoria = $marcasArray[array_rand($marcasArray)]['Make_Name'];
+
+    $urlModelos = "https://vpic.nhtsa.dot.gov/api/vehicles/getmodelsformake/" . urlencode($marcaAleatoria) . "?format=json";
+    $modelosJson = @file_get_contents($urlModelos);
+    if ($modelosJson === false) {
+        $modeloAleatorio = 'Model ' . rand(1, 10);
+    } else {
+        $modelos = json_decode($modelosJson, true);
+        if ($modelos === null || empty($modelos['Results'])) {
+            $modeloAleatorio = 'Model ' . rand(1, 10);
+        } else {
+            $modelosArray = $modelos['Results'];
+            $modeloAleatorio = $modelosArray[array_rand($modelosArray)]['Model_Name'];
+        }
+    }
+
+    return [
+        'marca' => $marcaAleatoria,
+        'model' => $modeloAleatorio
+    ];
+}
+
 ?>
