@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="button" onclick="window.location.href='?generate=1'" class="principalBox">Generar Vehicle Aleatori 🎲</button><br><br>
             <div class="button-row">
                 <!-- Botó per tornar a la pàgina principal -->
-                <button class="principalBox" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>
+                <button class="principalBox" type="button" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>
                 <!-- Botó per enviar el formulari -->
                 <button class="principalBox" type="submit">Insertar ⛳</button>
             </div>

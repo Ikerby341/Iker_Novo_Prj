@@ -243,7 +243,18 @@ function get_random_vehicle() {
     }
 
     $marcasArray = $marcas['Results'];
-    $marcaAleatoria = $marcasArray[array_rand($marcasArray)]['Make_Name'];
+
+    // Filtrar marques comunes d'automòbils a Espanya
+    $common_makes = ['AUDI', 'VOLKSWAGEN', 'SEAT', 'BMW', 'SKODA', 'MERCEDES-BENZ', 'OPEL', 'FORD', 'RENAULT', 'PEUGEOT', 'CITROEN', 'KIA', 'HYUNDAI', 'TOYOTA', 'NISSAN', 'FIAT', 'VOLVO', 'MAZDA', 'HONDA', 'LEXUS'];
+    $filtered_makes = array_filter($marcasArray, function($make) use ($common_makes) {
+        return in_array(strtoupper($make['Make_Name']), $common_makes);
+    });
+
+    if (empty($filtered_makes)) {
+        $filtered_makes = $marcasArray;
+    }
+
+    $marcaAleatoria = $filtered_makes[array_rand($filtered_makes)]['Make_Name'];
 
     $urlModelos = "https://vpic.nhtsa.dot.gov/api/vehicles/getmodelsformake/" . urlencode($marcaAleatoria) . "?format=json";
     $modelosJson = @file_get_contents($urlModelos);
