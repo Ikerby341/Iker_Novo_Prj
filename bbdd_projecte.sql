@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 26-01-2026 a las 17:53:18
+-- Tiempo de generación: 31-03-2026 a las 17:02:53
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.0.30
 
@@ -21,14 +21,14 @@ SET time_zone = "+00:00";
 -- Base de datos: `bbdd_projecte`
 --
 
+CREATE DATABASE IF NOT EXISTS `bbdd_projecte` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `bbdd_projecte`;
+
 -- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `coches`
 --
-
-CREATE DATABASE IF NOT EXISTS `bbdd_projecte` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `bbdd_projecte`;
 
 CREATE TABLE `coches` (
   `ID` int(10) UNSIGNED NOT NULL,
@@ -47,10 +47,10 @@ INSERT INTO `coches` (`ID`, `marca`, `model`, `owner_id`, `ruta_img`) VALUES
 (4, 'Audi', 'RS6', 1, 'public/assets/img/RS6_17688469704c5e1d08.webp'),
 (5, 'Volkswagen', 'Passat', 1, 'public/assets/img/passat_176530010042bd42a5.png'),
 (6, 'Porsche', 'Panamera', 1, 'public/assets/img/panamera_17653008134cb77a97.png'),
-(15, 'Seat', 'Arona', 2, 'public/assets/img/arona_176537673606019567.webp'),
-(16, 'BMW', 'M3', 2, 'public/assets/img/m3_17653769398e85a483.png'),
-(17, 'Mercedes', 'A 45 AMG', 2, 'public/assets/img/a45_1765377036f23f1edc.png'),
-(18, 'Peugeot', '208', 2, 'public/assets/img/208_1765378671cdab29df.png'),
+(15, 'Seat', 'Arona', 2, 'public/assets/img/arona_177186884201d35ee9.webp'),
+(16, 'BMW', 'M3', 2, 'public/assets/img/m3_1771868808b471a973.webp'),
+(17, 'Mercedes', 'A 45 AMG', 2, 'public/assets/img/a45_1771869205e12c27aa.jpg'),
+(18, 'Peugeot', '208', 2, 'public/assets/img/peugo_177186922561a124e9.jpg'),
 (19, 'Seat', 'Ibiza', 1, 'public/assets/img/ibiza.webp'),
 (20, 'Volkswagen', 'Scirocco', 1, 'public/assets/img/scirocco_176529885739002241.webp'),
 (21, 'Volkswagen', 'Beetle', 1, 'public/assets/img/beetle_1765300716bdcfaafa.webp'),
@@ -80,19 +80,24 @@ CREATE TABLE `usuarios` (
   `remember_token` varchar(255) DEFAULT NULL,
   `admin` tinyint(1) NOT NULL DEFAULT 0,
   `reset_token` varchar(255) DEFAULT NULL,
-  `reset_token_expires` datetime DEFAULT NULL
+  `reset_token_expires` datetime DEFAULT NULL,
+  `discord_id` varchar(255) DEFAULT NULL,
+  `github_id` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id`, `username`, `email`, `password`, `remember_token`, `admin`, `reset_token`, `reset_token_expires`) VALUES
-(1, 'admin', 'admin@gmail.com', '$2y$10$fQWkDQQnuk6WmX9bE1vXu.l0DIPeaPNA4b.xSWI9WNjBu6z52p6JW', NULL, 1, NULL, NULL),
-(2, 'Mindundi', 'mindundi@gmail.com', '$2y$10$nnfAp97aXeI9iEx8yjWHUeATxTtog02ApC/9Go.JN2zSb6abtbEqi', NULL, 0, NULL, NULL),
-(5, 'Cupra', 'cupra@gmail.com', '$2y$10$t.cIM.pCrZ.GbhB7J4PrsedT/5zOtRAyfhMeDcSZDlUldExOPSRA6', NULL, 0, NULL, NULL),
-(6, 'Hola', 'hola@gmail.com', '$2y$10$b9qXEVk7yVlRlR0McpzaieVMYJM61pJd.Ge3Lhdz907qm4p6hyyEK', NULL, 0, NULL, NULL),
-(8, 'inovo', 'i.novo@sapalomera.cat', '$2y$10$ITgzfjcmR7X4OamruDwBIOdCN/Nts04.wy/OxZOjQBdeOCu/.uQ8S', NULL, 0, NULL, NULL);
+INSERT INTO `usuarios` (`id`, `username`, `email`, `password`, `remember_token`, `admin`, `reset_token`, `reset_token_expires`, `discord_id`, `github_id`) VALUES
+(1, 'admin', 'admin@gmail.com', '$2y$10$fQWkDQQnuk6WmX9bE1vXu.l0DIPeaPNA4b.xSWI9WNjBu6z52p6JW', '2c6d92e05d34eae55463ece6276265e461b3875ed111b7a49125b084f9568119', 1, NULL, NULL, NULL, NULL),
+(2, 'Mindundi', 'mindundi3@gmail.com', '$2y$10$nnfAp97aXeI9iEx8yjWHUeATxTtog02ApC/9Go.JN2zSb6abtbEqi', NULL, 0, NULL, NULL, NULL, NULL),
+(5, 'Cupra', 'cupra@gmail.com', '$2y$10$t.cIM.pCrZ.GbhB7J4PrsedT/5zOtRAyfhMeDcSZDlUldExOPSRA6', NULL, 0, NULL, NULL, NULL, NULL),
+(6, 'Hola', 'hola@gmail.com', '$2y$10$b9qXEVk7yVlRlR0McpzaieVMYJM61pJd.Ge3Lhdz907qm4p6hyyEK', NULL, 0, NULL, NULL, NULL, NULL),
+(8, 'inovo', 'i.novo@sapalomera.cat', '$2y$10$.s9oHyg62qHKF0lgbtyUC.AsC3785KlGFs0HHVPBPIlUdLdM6q/nC', NULL, 0, NULL, NULL, NULL, NULL),
+(9, 'Ventiscas', 'novoliva@gmail.com', '$2y$10$RxcfAQy7eYnK9J6aCMCnGeHTvB8lNThRuhXiw4GiZkC3TvhALlqou', NULL, 0, NULL, NULL, '428612629142044672', '183070787'),
+(10, 'Twinkerby', 'ikerby34@gmail.com', '', NULL, 0, NULL, NULL, NULL, '247655410'),
+(11, 'icerbai', 'ikernovo09@gmail.com', '', NULL, 0, NULL, NULL, NULL, '48623167');
 
 --
 -- Índices para tablas volcadas
@@ -110,6 +115,8 @@ ALTER TABLE `coches`
 --
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `discord_id` (`discord_id`),
+  ADD UNIQUE KEY `github_id` (`github_id`),
   ADD UNIQUE KEY `unico` (`username`) USING HASH,
   ADD UNIQUE KEY `correounico` (`email`) USING HASH;
 
@@ -121,13 +128,13 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `coches`
 --
 ALTER TABLE `coches`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Restricciones para tablas volcadas
@@ -137,7 +144,7 @@ ALTER TABLE `usuarios`
 -- Filtros para la tabla `coches`
 --
 ALTER TABLE `coches`
-  ADD CONSTRAINT `fk_coches_owner` FOREIGN KEY (`owner_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_coches_owner` FOREIGN KEY (`owner_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
