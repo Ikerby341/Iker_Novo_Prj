@@ -14,14 +14,30 @@
 
     // Procesar POST
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $uid = $_SESSION['user_id'] ?? null;
-        $newName = trim($_POST['pfname'] ?? '');
-        $newEmail = trim($_POST['pfemail'] ?? '');
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pfapikey'])) {
+            // Si s'ha fet clic al botó de generar nova API key, només actualitzem l'API key
+            $uid = $_SESSION['user_id'] ?? null;
+            if ($uid) {
+                $result = regenerate_api_key($uid);
+                $edit_msg = implode(' ', $result['messages']);
+                // Actualitzar el valor de l'API key a mostrar
+                if (isset($result['new_api_key'])) {
+                    $uinfo['api_key'] = $result['new_api_key'];
+                }
+            } else {
+                $edit_msg = 'Usuari no identificat.';
+            }
+        } else {
+            // Si és un POST normal, processem l'edició del perfil
+            $uid = $_SESSION['user_id'] ?? null;
+            $newName = trim($_POST['pfname'] ?? '');
+            $newEmail = trim($_POST['pfemail'] ?? '');
 
-        // Cridem a la funció del controlador
-        $result = process_edit_profile($uid, $newName, $newEmail);
-        $edit_msg = implode(' ', $result['messages']);
-        $currentEmail = $result['updated_data']['email'] ?? $currentEmail;
+            // Cridem a la funció del controlador
+            $result = process_edit_profile($uid, $newName, $newEmail);
+            $edit_msg = implode(' ', $result['messages']);
+            $currentEmail = $result['updated_data']['email'] ?? $currentEmail;
+        }
     }
 ?>
 <html lang="es">
@@ -48,6 +64,9 @@
             <input type="text" name="pfname" id="pfname" required value="<?php echo htmlspecialchars($_SESSION['username'] ?? ''); ?>"><br>
             <label for="pfemail">Correu electrònic:</label><br>
             <input type="email" name="pfemail" id="pfemail" value="<?php echo htmlspecialchars($currentEmail ?? ''); ?>"><br>
+            <label for="pfapikey">API key (no es pot editar):</label><br>
+            <input type="text" name="pfapikey" id="pfapikey" value="<?php echo htmlspecialchars($uinfo['api_key'] ?? ''); ?>" readonly>
+            <button class="principalBox" type="submit" name="generate">Generar nova API key</button><br><br>
             <div class="button-row">
                 <!-- Botó per tornar a la pàgina principal -->
                 <button class="principalBox" type="button" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>

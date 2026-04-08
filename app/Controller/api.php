@@ -1,15 +1,46 @@
 <?php
-// Include the articles model to access database functions
-require_once __DIR__ . '/../app/Model/articles_model.php';
+require_once __DIR__ . '/../../config/db-connection.php';
+require_once __DIR__ . '/../Model/articles_model.php';
 
-// Set headers for JSON API
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *'); // Allow cross-origin requests if needed
+header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-API-KEY');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
+    exit;
+}
+
+function get_api_key_from_request() {
+    if (!empty($_GET['api_key'])) {
+        return trim($_GET['api_key']);
+    }
+
+    if (!empty($_SERVER['HTTP_X_API_KEY'])) {
+        return trim($_SERVER['HTTP_X_API_KEY']);
+    }
+
+    if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+        $authHeader = trim($_SERVER['HTTP_AUTHORIZATION']);
+    } elseif (function_exists('getallheaders')) {
+        $headers = getallheaders();
+        $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? null;
+    } else {
+        $authHeader = null;
+    }
+
+    if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
+        return trim(substr($authHeader, 7));
+    }
+
+    return null;
+}
+
+$apiKey = get_api_key_from_request();
+if (!$apiKey || !is_valid_api_key($apiKey)) {
+    http_response_code(401);
+    echo json_encode(['error' => 'API key invàlida o no proporcionada.']);
     exit;
 }
 

@@ -58,7 +58,30 @@ S'ha afegit una API senzilla en `api.php` per consultar dades dels vehicles en f
 
 - Format de resposta: JSON  
 - Mètode suportat: GET  
-- CORS habilitat (es permeten peticions externes)  
+- CORS habilitat (es permeten peticions externes)
+- **Autenticació requerida**: Tota petició requereix una API key vàlida de la base de dades.
+
+### Autenticació per API Key
+Cada endpoint requereix autenticació. Pots passar la API key de tres formes:
+
+1. **Paràmetre de query (`api_key`):**
+   ```
+   GET /api/vehicles?api_key=TU_API_KEY
+   ```
+
+2. **Header `X-API-KEY`:**
+   ```
+   GET /api/vehicles
+   Header: X-API-KEY: TU_API_KEY
+   ```
+
+3. **Header `Authorization` amb `Bearer`:**
+   ```
+   GET /api/vehicles
+   Header: Authorization: Bearer TU_API_KEY
+   ```
+
+Si la API key no és vàlida o no es proporciona, retorna un error `401 Unauthorized`.
 
 ### Endpoints disponibles
 - `GET /api/vehicles`  
@@ -68,8 +91,10 @@ S'ha afegit una API senzilla en `api.php` per consultar dades dels vehicles en f
   Retorna els vehicles associats a un usuari concret.
 
 ### Notes
-- Només s’accepten peticions GET (altres mètodes retornen error).  
-- Si l’endpoint no existeix, retorna un error 404.  
+- Només s'accepten peticions GET (altres mètodes retornen error).  
+- Si l'endpoint no existeix, retorna un error 404.  
+- La API key es pot generar/regenerar des de la pàgina d'edició de perfil de l'usuari.
+- Cada API key està associada a un usuari específic a la base de dades.
 - Internament utilitza les funcions del model (`articles_model.php`) per obtenir les dades.  
 
 Comparativa: OAuth amb Discord (manual) vs Hybridauth amb GitHub

@@ -295,4 +295,19 @@ function reset_user_password($token, $new_password) {
     }
 }
 
+function regenerate_user_api_key($userId) {
+    global $connexio;
+    try {
+        $newApiKey = bin2hex(random_bytes(16)); // Genera una nueva API key de 32 caracteres hexadecimales
+        $stmt = $connexio->prepare('UPDATE usuarios SET api_key = :k WHERE id = :id');
+        if ($stmt->execute([':k' => $newApiKey, ':id' => $userId])) {
+            return ['success' => true, 'new_api_key' => $newApiKey, 'messages' => ['API key regenerada correctament.']];
+        } else {
+            return ['success' => false, 'messages' => ['Error en regenerar la API key.']];
+        }
+    } catch (PDOException $e) {
+        return ['success' => false, 'messages' => ['Excepció en regenerar la API key: ' . $e->getMessage()]];
+    }
+}
+
 ?>

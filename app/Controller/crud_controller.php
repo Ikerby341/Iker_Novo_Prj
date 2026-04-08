@@ -451,4 +451,8 @@
     function get_random_vehicle_data() {
         return get_random_vehicle();
     }
+
+    function regenerate_api_key($user_id) {
+        return regenerate_user_api_key($user_id);
+    }
 ?>
