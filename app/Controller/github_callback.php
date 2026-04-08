@@ -43,7 +43,7 @@ if (!$user && $email) {
 if ($user) {
     // Si existe, enlazar github_id si no estaba y loguear
     if (empty($user['github_id']) && function_exists('update_user_github_link')) {
-        update_user_github_link($user['id'], $githubId, 'github');
+        update_user_github_link($user['id'], $githubId);
     }
     login_user_oauth($user['id']);
     header('Location: ../app/View/vista.php');
