@@ -35,16 +35,9 @@ if (function_exists('get_user_by_github_id')) {
     $user = get_user_by_github_id($githubId);
 }
 
-// Si no existe por github_id, intentar por email
+// Si no existe por github_id, intentar por email usando el modelo
 if (!$user && $email) {
-    global $connexio;
-    try {
-        $stmt = $connexio->prepare('SELECT * FROM usuarios WHERE email = :e LIMIT 1');
-        $stmt->execute([':e' => $email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    } catch (Exception $e) {
-        $user = false;
-    }
+    $user = get_user_by_email($email);
 }
 
 if ($user) {
@@ -76,19 +69,10 @@ if ($user) {
         $i++;
     }
 
-    // Crear usuari OAuth GitHub segons l'esquema actual: username, email, github_id, password (obligatori)
+    // Crear usuari OAuth GitHub usant el modelo
     try {
-        global $connexio;
-        $stmt = $connexio->prepare('INSERT INTO usuarios (username, email, password, github_id) VALUES (:u, :e, :p, :g)');
-        $ok = $stmt->execute([
-            ':u' => $finalUsername,
-            ':e' => $email,
-            ':p' => '', // password buida per usuaris OAuth
-            ':g' => $githubId
-        ]);
-        if ($ok) {
-            $id = $connexio->lastInsertId();
-            $user = get_user_by_id($id);
+        if (create_user_oauth_github($finalUsername, $email, $githubId)) {
+            $user = get_user_by_github_id($githubId);
             if ($user) {
                 login_user_oauth($user['id']);
                 header('Location: ../app/View/vista.php');

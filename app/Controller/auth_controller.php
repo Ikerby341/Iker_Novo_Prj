@@ -188,8 +188,7 @@ function login_user_oauth($user_id) {
  * Retorna array('success'=>bool,'message'=>string)
  */
 function change_password($user_id, $current_password, $new_password, $confirm_password) {
-    require_once __DIR__ . '/../../config/db-connection.php';
-    global $connexio;
+    require_once __DIR__ . '/../Model/users_model.php';
     
     $current_password = trim($current_password);
     $new_password = trim($new_password);
@@ -207,40 +206,39 @@ function change_password($user_id, $current_password, $new_password, $confirm_pa
     }
 
     try {
-        // Obtenir la contrasenya actual de la BD
-        $stmt = $connexio->prepare('SELECT password FROM usuarios WHERE id = ? LIMIT 1');
-        $stmt->execute([$user_id]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Obtenir la contrasenya actual de la BD usant el model
+        $stored_password = get_user_password($user_id);
 
-        if (!$row) {
+        if ($stored_password === null) {
             return ['success' => false, 'message' => 'Usuari no trobat'];
         }
 
         // Si l'usuari no té contrasenya (OAuth), permetre canviar sense verificar l'actual
-        if (empty($row['password'])) {
+        if (empty($stored_password)) {
             if (!empty($current_password)) {
                 return ['success' => false, 'message' => 'No tens contrasenya actual. Deixa el camp buit.'];
             }
         } else {
             // Verificar contrasenya actual
-            if (!password_verify($current_password, $row['password'])) {
+            if (!password_verify($current_password, $stored_password)) {
                 return ['success' => false, 'message' => 'La contrasenya actual és incorrecta'];
             }
         }
 
         // Actualitzar la contrasenya a la BD
         $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
-        $update_stmt = $connexio->prepare('UPDATE usuarios SET password = ? WHERE id = ?');
-        $update_stmt->execute([$hashed_password, $user_id]);
-
-        return ['success' => true, 'message' => '✓ Contrasenya actualitzada correctament'];
+        if (update_user_password_hash($user_id, $hashed_password)) {
+            return ['success' => true, 'message' => '✓ Contrasenya actualitzada correctament'];
+        } else {
+            return ['success' => false, 'message' => 'Error en actualitzar la contrasenya'];
+        }
     } catch (PDOException $e) {
         return ['success' => false, 'message' => 'Error a la base de dades: ' . $e->getMessage()];
     }
 }
 
 function process_forgot_password($email) {
-    require_once __DIR__ . '/../../config/db-connection.php';
+    require_once __DIR__ . '/../Model/users_model.php';
     
     $email = trim(strtolower($email));
     
@@ -255,11 +253,8 @@ function process_forgot_password($email) {
     }
     
     try {
-        // Comprovar si l'usuari existeix
-        global $connexio;
-        $stmt = $connexio->prepare('SELECT id, username FROM usuarios WHERE email = ? LIMIT 1');
-        $stmt->execute([$email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Comprovar si l'usuari existeix usant el modelo
+        $user = get_user_by_email($email);
         
         // Per seguretat, sempre mostrem el missatge positiu als usuaris
         // (no revelarem si un email existeix o no)
@@ -277,10 +272,11 @@ function process_forgot_password($email) {
         // Carregar configuració
         $config = require __DIR__ . '/../../config/mailer.php';
         
-        // Emmagatzemar el token a la BD amb expiration
+        // Emmagatzemar el token a la BD amb expiration usant el modelo
         $expires_at = date('Y-m-d H:i:s', strtotime($config['password_reset']['token_expiration']));
-        $update_stmt = $connexio->prepare('UPDATE usuarios SET reset_token = ?, reset_token_expires = ? WHERE id = ?');
-        $update_stmt->execute([$token, $expires_at, $user['id']]);
+        if (!update_reset_token($user['id'], $token, $expires_at)) {
+            return ['success' => true, 'message' => 'Si el correu electrònic existeix al nostre sistema, rebràs instruccions per restablir la contrasenya.'];
+        }
         
         // Generar el link de recuperació
         $reset_link = 'http://localhost/Practiques/Backend/Iker_Novo_Prj/app/View/resetpassword.php?token=' . $token;

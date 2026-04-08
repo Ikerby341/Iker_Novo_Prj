@@ -310,4 +310,50 @@ function regenerate_user_api_key($userId) {
     }
 }
 
+/**
+ * get_user_password
+ * Retorna la contrasenya hasheada d'un usuari
+ */
+function get_user_password($user_id) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('SELECT password FROM usuarios WHERE id = ? LIMIT 1');
+        $stmt->execute([$user_id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? $row['password'] : null;
+    } catch (PDOException $e) {
+        return null;
+    }
+}
+
+/**
+ * update_reset_token
+ * Actualiza el token de reset y su fecha de expiración
+ */
+function update_reset_token($user_id, $token, $expires_at) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('UPDATE usuarios SET reset_token = ?, reset_token_expires = ? WHERE id = ?');
+        return $stmt->execute([$token, $expires_at, $user_id]);
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * get_user_by_email
+ * Retorna un array amb les dades de l'usuari o false si no existeix
+ */
+function get_user_by_email($email) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('SELECT id, username FROM usuarios WHERE email = ? LIMIT 1');
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user ? $user : false;
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
 ?>

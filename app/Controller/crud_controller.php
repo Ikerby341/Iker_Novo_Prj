@@ -116,11 +116,10 @@
         }
 
         try {
-            require_once __DIR__ . '/../../config/db-connection.php';
-            global $connexio;
-            $stmt = $connexio->prepare('SELECT owner_id, ruta_img FROM coches WHERE ID = ? LIMIT 1');
-            $stmt->execute([$id]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            require_once __DIR__ . '/../Model/articles_model.php';
+            
+            // Obtenir propietari i imatge usant el modelo
+            $row = get_article_owner_and_image($id);
 
             if (!$row) {
                 return ['success' => false, 'message' => 'Article no trobat'];
@@ -202,16 +201,15 @@
         }
 
         try {
-            require_once __DIR__ . '/../../config/db-connection.php';
-            global $connexio;
-            $stmt = $connexio->prepare('SELECT owner_id FROM coches WHERE ID = ? LIMIT 1');
-            $stmt->execute([$id]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            require_once __DIR__ . '/../Model/articles_model.php';
+            
+            // Obtenir propietari usant el modelo
+            $owner_id = get_article_owner($id);
 
-            if (!$row) {
+            if ($owner_id === false) {
                 return ['success' => false, 'message' => 'Article no trobat'];
             }
-            if ((int)$row['owner_id'] !== (int)($_SESSION['user_id'] ?? 0)) {
+            if ((int)$owner_id !== (int)($_SESSION['user_id'] ?? 0)) {
                 return ['success' => false, 'message' => 'No tens permís per esborrar aquest article'];
             }
 

@@ -287,4 +287,36 @@ function is_valid_api_key($apiKey) {
     }
 }
 
+/**
+ * get_article_owner_and_image
+ * Retorna l'owner_id i ruta_img d'un article
+ */
+function get_article_owner_and_image($id) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('SELECT owner_id, ruta_img FROM coches WHERE ID = ? LIMIT 1');
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? $row : false;
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * get_article_owner
+ * Retorna l'owner_id d'un article
+ */
+function get_article_owner($id) {
+    global $connexio;
+    try {
+        $stmt = $connexio->prepare('SELECT owner_id FROM coches WHERE ID = ? LIMIT 1');
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? $row['owner_id'] : false;
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
 ?>
