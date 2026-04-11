@@ -7,12 +7,27 @@ $missatge = '';
 $marca_generada = '';
 $model_generat = '';
 
+function is_ajax_request() {
+    return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+}
+
 // Comprovem si s'ha demanat generar vehicle aleatori (POST)
 if (isset($_POST['generate'])) {
     $vehicle = get_random_vehicle_data();
     if ($vehicle) {
         $marca_generada = $vehicle['marca'];
         $model_generat = $vehicle['model'];
+    }
+
+    if (is_ajax_request()) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'success' => (bool)$vehicle,
+            'marca' => $marca_generada,
+            'model' => $model_generat,
+            'message' => $vehicle ? 'Vehicle generat correctament.' : 'No s\'ha pogut generar el vehicle. Torna a provar-ho.',
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 }
 
@@ -61,7 +76,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['generate'])) {
                 <label for="cos">Model:</label><br>
                 <input type="text" name="cos" id="cos" value="<?php echo htmlspecialchars($model_generat); ?>" ><br>
                 <!-- Ara envia el formulari per POST amb name="generate" -->
-                <button type="submit" name="generate" value="1" class="principalBox">Generar Vehicle Aleatori des de API</button><br><br>
+                <button type="submit" id="generateVehicleBtn" name="generate" value="1" class="principalBox">Generar Vehicle Aleatori des de API</button><br><br>
+                <div id="generateMessage" class="form-info" style="display:none;">
+                    <span class="info-icon">ℹ️</span>
+                    <span class="info-text" id="generateMessageText"></span>
+                </div>
                 <div class="button-row">
                     <button type="button" class="principalBox" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>
                     <button type="submit" class="principalBox">Insertar ⛳</button>
@@ -75,5 +94,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['generate'])) {
             <div class="footer-small">Gràcies per visitar · <script>document.write(new Date().getFullYear());</script></div>
         </div>
     </footer>
+    <script>
+        (function() {
+            var generateBtn = document.getElementById('generateVehicleBtn');
+            var marcaInput = document.getElementById('titol');
+            var modelInput = document.getElementById('cos');
+            var messageContainer = document.getElementById('generateMessage');
+            var messageText = document.getElementById('generateMessageText');
+            var form = generateBtn ? generateBtn.closest('form') : null;
+
+            function showMessage(text, isError) {
+                if (!messageContainer || !messageText) return;
+                messageText.textContent = text;
+                messageContainer.style.display = 'block';
+                messageContainer.classList.toggle('form-error', !!isError);
+                messageContainer.classList.toggle('form-info', !isError);
+            }
+
+            function clearMessage() {
+                if (!messageContainer || !messageText) return;
+                messageText.textContent = '';
+                messageContainer.style.display = 'none';
+                messageContainer.classList.remove('form-error');
+            }
+
+            if (generateBtn && form) {
+                generateBtn.addEventListener('click', function(event) {
+                    if (!window.fetch) {
+                        return; // si no hay fetch, dejamos el submit normal
+                    }
+
+                    event.preventDefault();
+                    clearMessage();
+                    generateBtn.disabled = true;
+                    generateBtn.textContent = 'Generant...';
+
+                    var formData = new FormData();
+                    formData.append('generate', '1');
+
+                    fetch('', {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    }).then(function(response) {
+                        return response.json();
+                    }).then(function(data) {
+                        if (data && data.success) {
+                            if (marcaInput) marcaInput.value = data.marca || '';
+                            if (modelInput) modelInput.value = data.model || '';
+                            showMessage(data.message || 'Vehicle generat correctament.', false);
+                        } else {
+                            showMessage(data.message || 'No s\'ha pogut generar el vehicle.', true);
+                        }
+                    }).catch(function() {
+                        showMessage('Error de xarxa. Torna a provar-ho.', true);
+                    }).finally(function() {
+                        generateBtn.disabled = false;
+                        generateBtn.textContent = 'Generar Vehicle Aleatori des de API';
+                    });
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

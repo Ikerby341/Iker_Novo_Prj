@@ -204,3 +204,10 @@ Correccions PROJECTE FASE 3
 ### 15. Processament de formularis POST i redireccions directes a les vistes admin.php i edit_user.php
 - **Problema identificat**: Les vistes `admin.php` i `edit_user.php` processaven directament els formularis POST, cridaven funcions del model (`get_all_users()`) i feien redireccions amb `header()`.
 - **Solució implementada**: S'han creat funcions del controlador `admin_page_controller()` i `edit_user_page_controller($user_id)` a `crud_controller.php` que gestionen tot el processament de POST, les redireccions i retornen les dades necessàries per a les vistes. Les vistes ara només criden aquestes funcions del controlador i mostren les dades retornades, mantenint la separació de capes MVC.
+
+AJAX
+----
+- He afegit millores amb AJAX a dues parts del projecte sense canviar la lògica de negoci del model/controlador.
+- A `app/View/create.php`, el botó **Generar Vehicle Aleatori des de API** fa una petició `fetch()` al mateix fitxer i rep una resposta JSON amb `marca` i `model`. Això omple els camps del formulari sense recarregar tota la pàgina.
+- A `app/View/editprofile.php`, el botó **Generar nova API key** també fa una petició AJAX a la mateixa pàgina i actualitza el camp readonly de l'API key amb la nova clau.
+- També es manté la compatibilitat sense JavaScript: si no hi ha `fetch()`, els botons segueixen funcionant com abans amb formularis POST normals.

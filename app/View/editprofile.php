@@ -12,20 +12,33 @@
 
     $edit_msg = '';
 
+    function is_ajax_request() {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+    }
+
     // Procesar POST
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pfapikey'])) {
-            // Si s'ha fet clic al botó de generar nova API key, només actualitzem l'API key
+        if (isset($_POST['generate'])) {
+            // Generar nova API key
             $uid = $_SESSION['user_id'] ?? null;
             if ($uid) {
                 $result = regenerate_api_key($uid);
                 $edit_msg = implode(' ', $result['messages']);
-                // Actualitzar el valor de l'API key a mostrar
                 if (isset($result['new_api_key'])) {
                     $uinfo['api_key'] = $result['new_api_key'];
                 }
             } else {
                 $edit_msg = 'Usuari no identificat.';
+            }
+
+            if (is_ajax_request()) {
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'success' => isset($result['success']) ? (bool)$result['success'] : false,
+                    'new_api_key' => $result['new_api_key'] ?? null,
+                    'message' => $edit_msg,
+                ], JSON_UNESCAPED_UNICODE);
+                exit;
             }
         } else {
             // Si és un POST normal, processem l'edició del perfil
@@ -66,7 +79,11 @@
             <input type="email" name="pfemail" id="pfemail" value="<?php echo htmlspecialchars($currentEmail ?? ''); ?>"><br>
             <label for="pfapikey">API key (no es pot editar):</label><br>
             <input type="text" name="pfapikey" id="pfapikey" value="<?php echo htmlspecialchars($uinfo['api_key'] ?? ''); ?>" readonly>
-            <button class="principalBox" type="submit" name="generate">Generar nova API key</button><br><br>
+            <button class="principalBox" type="submit" id="generateApiKeyBtn" name="generate" value="1">Generar nova API key</button><br><br>
+            <div id="apiKeyMessage" class="form-info" style="display:none;">
+                <span class="info-icon">ℹ️</span>
+                <span class="info-text" id="apiKeyMessageText"></span>
+            </div>
             <div class="button-row">
                 <!-- Botó per tornar a la pàgina principal -->
                 <button class="principalBox" type="button" onclick="location.href='<?php echo (defined('BASE_URL') ? BASE_URL : '/'); ?>';">← Tornar enrere</button>
@@ -82,5 +99,68 @@
             <div class="footer-small">Gràcies per visitar · <script>document.write(new Date().getFullYear());</script></div>
         </div>
     </footer>
+    <script>
+        (function() {
+            var generateBtn = document.getElementById('generateApiKeyBtn');
+            var apiKeyInput = document.getElementById('pfapikey');
+            var messageContainer = document.getElementById('apiKeyMessage');
+            var messageText = document.getElementById('apiKeyMessageText');
+            var form = generateBtn ? generateBtn.closest('form') : null;
+
+            function showMessage(text, isError) {
+                if (!messageContainer || !messageText) return;
+                messageText.textContent = text;
+                messageContainer.style.display = 'block';
+                messageContainer.classList.toggle('form-error', !!isError);
+                messageContainer.classList.toggle('form-info', !isError);
+            }
+
+            function clearMessage() {
+                if (!messageContainer || !messageText) return;
+                messageText.textContent = '';
+                messageContainer.style.display = 'none';
+                messageContainer.classList.remove('form-error');
+            }
+
+            if (generateBtn && form) {
+                generateBtn.addEventListener('click', function(event) {
+                    if (!window.fetch) {
+                        return; // si no hay fetch, dejamos el submit normal
+                    }
+
+                    event.preventDefault();
+                    clearMessage();
+                    generateBtn.disabled = true;
+                    generateBtn.textContent = 'Generant...';
+
+                    var formData = new FormData();
+                    formData.append('generate', '1');
+
+                    fetch('', {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    }).then(function(response) {
+                        return response.json();
+                    }).then(function(data) {
+                        if (data && data.success) {
+                            if (apiKeyInput) apiKeyInput.value = data.new_api_key || '';
+                            showMessage(data.message || 'API key regenerada correctament.', false);
+                        } else {
+                            showMessage(data.message || 'No s\'ha pogut regenerar la API key.', true);
+                        }
+                    }).catch(function() {
+                        showMessage('Error de xarxa. Torna a provar-ho.', true);
+                    }).finally(function() {
+                        generateBtn.disabled = false;
+                        generateBtn.textContent = 'Generar nova API key';
+                    });
+                });
+            }
+        })();
+    </script>
 </body>
 </html>
