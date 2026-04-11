@@ -276,17 +276,6 @@ function get_random_vehicle() {
     ];
 }
 
-function is_valid_api_key($apiKey) {
-    global $connexio;
-    try {
-        $stmt = $connexio->prepare('SELECT id FROM usuarios WHERE api_key = :k LIMIT 1');
-        $stmt->execute([':k' => $apiKey]);
-        return (bool) $stmt->fetch(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        return false;
-    }
-}
-
 /**
  * get_article_owner_and_image
  * Retorna l'owner_id i ruta_img d'un article

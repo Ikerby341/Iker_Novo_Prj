@@ -5,9 +5,11 @@
 
     // Obtenir email actual per comparacions
     $currentEmail = '';
+    $isApiKeyGenerated = false;
     if (isset($_SESSION['username']) && function_exists('get_user_by_username')) {
         $uinfo = get_user_by_username($_SESSION['username']);
         if ($uinfo && isset($uinfo['email'])) $currentEmail = $uinfo['email'];
+        $isApiKeyGenerated = !empty($uinfo['api_key']);
     }
 
     $edit_msg = '';
@@ -78,7 +80,7 @@
             <label for="pfemail">Correu electrònic:</label><br>
             <input type="email" name="pfemail" id="pfemail" value="<?php echo htmlspecialchars($currentEmail ?? ''); ?>"><br>
             <label for="pfapikey">API key (no es pot editar):</label><br>
-            <input type="text" name="pfapikey" id="pfapikey" value="<?php echo htmlspecialchars($uinfo['api_key'] ?? ''); ?>" readonly>
+            <input type="text" name="pfapikey" id="pfapikey" value="<?php echo $isApiKeyGenerated ? 'Generada' : ''; ?>" readonly>
             <button class="principalBox" type="submit" id="generateApiKeyBtn" name="generate" value="1">Generar nova API key</button><br><br>
             <div id="apiKeyMessage" class="form-info" style="display:none;">
                 <span class="info-icon">ℹ️</span>

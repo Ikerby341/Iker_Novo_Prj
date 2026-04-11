@@ -298,13 +298,26 @@ function reset_user_password($token, $new_password) {
 function regenerate_user_api_key($userId) {
     global $connexio;
     try {
-        $newApiKey = bin2hex(random_bytes(16)); // Genera una nueva API key de 32 caracteres hexadecimales
-        $stmt = $connexio->prepare('UPDATE usuarios SET api_key = :k WHERE id = :id');
-        if ($stmt->execute([':k' => $newApiKey, ':id' => $userId])) {
-            return ['success' => true, 'new_api_key' => $newApiKey, 'messages' => ['API key regenerada correctament.']];
-        } else {
-            return ['success' => false, 'messages' => ['Error en regenerar la API key.']];
+        $maxAttempts = 10;
+        for ($attempt = 0; $attempt < $maxAttempts; $attempt++) {
+            $newApiKey = bin2hex(random_bytes(16)); // Genera una nueva API key de 32 caracteres hexadecimales
+            $hashedApiKey = hash('sha256', $newApiKey); // Hashea la API key para mayor seguridad
+            
+            // Comprobar si el hash ya existe en la base de datos
+            $checkStmt = $connexio->prepare('SELECT id FROM usuarios WHERE api_key = :k LIMIT 1');
+            $checkStmt->execute([':k' => $hashedApiKey]);
+            if (!$checkStmt->fetch(PDO::FETCH_ASSOC)) {
+                // No existe, proceder a guardar
+                $stmt = $connexio->prepare('UPDATE usuarios SET api_key = :k WHERE id = :id');
+                if ($stmt->execute([':k' => $hashedApiKey, ':id' => $userId])) {
+                    return ['success' => true, 'new_api_key' => $newApiKey, 'messages' => ['API key regenerada correctament.']];
+                } else {
+                    return ['success' => false, 'messages' => ['Error en regenerar la API key.']];
+                }
+            }
         }
+        // Si después de 10 intentos no se encuentra una única, devolver error
+        return ['success' => false, 'messages' => ['No se pudo generar una API key única después de varios intentos.']];
     } catch (PDOException $e) {
         return ['success' => false, 'messages' => ['Excepció en regenerar la API key: ' . $e->getMessage()]];
     }
@@ -351,6 +364,18 @@ function get_user_by_email($email) {
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         return $user ? $user : false;
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+function is_valid_api_key($apiKey) {
+    global $connexio;
+    try {
+        $hashedApiKey = hash('sha256', $apiKey);
+        $stmt = $connexio->prepare('SELECT id FROM usuarios WHERE api_key = :k LIMIT 1');
+        $stmt->execute([':k' => $hashedApiKey]);
+        return (bool) $stmt->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         return false;
     }

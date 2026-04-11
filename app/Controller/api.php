@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/db-connection.php';
 require_once __DIR__ . '/../Model/articles_model.php';
+require_once __DIR__ . '/../Model/users_model.php';
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
